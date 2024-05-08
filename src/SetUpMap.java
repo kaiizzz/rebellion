@@ -68,21 +68,35 @@ public class SetUpMap {
         }
     }
 
-    public void displayMap() {
+    public void displayMap(Entity[][] map) {
         // display map
         for (int i = 0; i < Main.MAP_SIZE; i++) {
             for (int j = 0; j < Main.MAP_SIZE; j++) {
-                if (this.map[i][j] == null) {
+                if (map[i][j] == null) {
                     System.out.print("[ ]");
                 } else {
-                    if (this.map[i][j].getSymbol() == Agent.AGENT) {
-                        System.out.print("[" + Main.ANSI_GREEN + this.map[i][j].getSymbol() + Main.ANSI_RESET + "]");
-                    } else if (this.map[i][j].getSymbol() == Police.POLICE) {
-                        System.out.print("[" + Main.ANSI_BLUE + this.map[i][j].getSymbol() + Main.ANSI_RESET + "]");
-                    } else if (this.map[i][j].getSymbol() == Agent.REBEL) {
-                        System.out.print("[" + Main.ANSI_RED + this.map[i][j].getSymbol() + Main.ANSI_RESET + "]");
-                    } else if (this.map[i][j].getSymbol() == Agent.JAILED) {
-                        System.out.print("[" + Main.ANSI_PURPLE + this.map[i][j].getSymbol() + Main.ANSI_RESET + "]");
+                    // if (map[i][j].getSymbol() == Agent.AGENT) {
+                    //     System.out.print("[" + Main.ANSI_GREEN + Agent.AGENT + Main.ANSI_RESET + "]");
+                    // } else if (map[i][j].getSymbol() == Police.POLICE) {
+                    //     System.out.print("[" + Main.ANSI_BLUE + Police.POLICE + Main.ANSI_RESET + "]");
+                    // } else if (map[i][j].getSymbol() == Agent.REBEL) {
+                    //     System.out.print("[" + Main.ANSI_RED + Agent.REBEL + Main.ANSI_RESET + "]");
+                    // } else if (map[i][j].getSymbol() == Agent.JAILED) {
+                    //     System.out.print("[" + Main.ANSI_PURPLE + Agent.JAILED + Main.ANSI_RESET + "]");
+                    // }
+
+                    if (map[i][j].getSymbol() == Agent.AGENT || map[i][j].getSymbol() == Agent.REBEL) {
+                        Agent agent = (Agent) map[i][j];
+                        if (agent.rebel(this.map, i, j)) {
+                            System.out.print("[" + Main.ANSI_RED + Agent.REBEL + Main.ANSI_RESET + "]");
+                        } else {
+                            System.out.print("[" + Main.ANSI_GREEN + Agent.AGENT + Main.ANSI_RESET + "]");
+                        }
+                    
+                    } else if (map[i][j].getSymbol() == Agent.JAILED) {
+                        System.out.print("[" + Main.ANSI_RED + Agent.JAILED + Main.ANSI_RESET + "]");
+                    } else if (map[i][j].getSymbol() == Police.POLICE) {
+                        System.out.print("[" + Main.ANSI_BLUE + Police.POLICE + Main.ANSI_RESET + "]");
                     }
                 }
             }
@@ -92,6 +106,14 @@ public class SetUpMap {
 
     public Entity[][] getMap() {
         return this.map;
+    }
+
+    public void set(int i, int j, Entity entity) {
+        this.map[i][j] = entity;
+    }
+
+    public void set2(int i, int j, char symbol) {
+        this.map[i][j].setSymbol(symbol);
     }
 
 }

@@ -45,7 +45,7 @@ public class Agent extends Entity {
         int direction = (int) (Math.random() * 8);
         int newX = x + dx[direction];
         int newY = y + dy[direction];
-        rebel(map, x, y);
+        //rebel(map, x, y);
         // Check if the new position can be moved onto
         if (newX >= 0 && newX < map.length && newY >= 0 && newY < map[0].length && map[newX][newY] == null) {
             map[newX][newY] = map[x][y];
@@ -63,16 +63,21 @@ public class Agent extends Entity {
         }
     }
 
-    public void rebel(Entity[][] map, int x, int y) {
-        System.out.println((this.greivance - this.riskAversion *
-                determineArrestProbability(map, x, y)) > REBEL_THRESHOLD);
-        if (this.state == AgentState.NORMAL) {
-            if ((this.greivance - this.riskAversion * determineArrestProbability(map, x, y)) > REBEL_THRESHOLD) {
-                System.out.println("Agent rebelled-------------------------------------------------------");
-                this.state = AgentState.REBEL;
-                this.setSymbol(REBEL);
-            }
-        }
+    public Boolean rebel(Entity[][] map, int x, int y) {
+        // System.out.println((this.greivance - this.riskAversion *
+        //         determineArrestProbability(map, x, y)) > REBEL_THRESHOLD);
+       // System.out.println(super.getSymbol());
+        if ((this.greivance - this.riskAversion * determineArrestProbability(map, x, y)) > REBEL_THRESHOLD) {
+            this.state = AgentState.REBEL;
+            //this.symbol = REBEL;
+            //System.out.println(super.getSymbol());
+            return true;
+        } else {
+            this.state = AgentState.NORMAL;
+            //this.symbol = AGENT;
+            //System.out.println(super.getSymbol());
+            return false;
+        }   
     }
 
     public int countAgentsInNeighbourhood(Entity[][] map, int xpos, int ypos) {
@@ -143,5 +148,4 @@ public class Agent extends Entity {
 
         return (1 - Math.exp(-K * Math.floor(policeCount / (1 + countAgentsInNeighbourhood(map, xpos, ypos)))));
     }
-
 }

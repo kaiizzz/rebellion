@@ -1,5 +1,5 @@
 public class Entity {
-    private char symbol;
+    protected char symbol;
 
     public Entity(char symbol) {
         // System.out.println("Entity created");

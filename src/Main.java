@@ -26,17 +26,19 @@ public class Main {
         // insert
         SetUpMap setUpMap = new SetUpMap(INITIAL_AGENT_DENSITY, INITIAL_POLICE_DENSITY);
         setUpMap.setUpMap(MAP_SIZE);
-        setUpMap.displayMap();
+        setUpMap.displayMap(setUpMap.getMap());
         while (true) {
             main.step(setUpMap.getMap());
             System.out.println();
-            setUpMap.displayMap();
+            setUpMap.displayMap(setUpMap.getMap());
             try {
                 Thread.sleep(TICK);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
+            setUpMap.set(39, 39, new Agent());
+            setUpMap.set2(39, 39, Agent.AGENT);
         }
 
     }
