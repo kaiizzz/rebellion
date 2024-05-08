@@ -76,13 +76,16 @@ public class SetUpMap {
                     System.out.print("[ ]");
                 } else {
                     // if (map[i][j].getSymbol() == Agent.AGENT) {
-                    //     System.out.print("[" + Main.ANSI_GREEN + Agent.AGENT + Main.ANSI_RESET + "]");
+                    // System.out.print("[" + Main.ANSI_GREEN + Agent.AGENT + Main.ANSI_RESET +
+                    // "]");
                     // } else if (map[i][j].getSymbol() == Police.POLICE) {
-                    //     System.out.print("[" + Main.ANSI_BLUE + Police.POLICE + Main.ANSI_RESET + "]");
+                    // System.out.print("[" + Main.ANSI_BLUE + Police.POLICE + Main.ANSI_RESET +
+                    // "]");
                     // } else if (map[i][j].getSymbol() == Agent.REBEL) {
-                    //     System.out.print("[" + Main.ANSI_RED + Agent.REBEL + Main.ANSI_RESET + "]");
+                    // System.out.print("[" + Main.ANSI_RED + Agent.REBEL + Main.ANSI_RESET + "]");
                     // } else if (map[i][j].getSymbol() == Agent.JAILED) {
-                    //     System.out.print("[" + Main.ANSI_PURPLE + Agent.JAILED + Main.ANSI_RESET + "]");
+                    // System.out.print("[" + Main.ANSI_PURPLE + Agent.JAILED + Main.ANSI_RESET +
+                    // "]");
                     // }
 
                     if (map[i][j].getSymbol() == Agent.AGENT || map[i][j].getSymbol() == Agent.REBEL) {
@@ -92,7 +95,7 @@ public class SetUpMap {
                         } else {
                             System.out.print("[" + Main.ANSI_GREEN + Agent.AGENT + Main.ANSI_RESET + "]");
                         }
-                    
+
                     } else if (map[i][j].getSymbol() == Agent.JAILED) {
                         System.out.print("[" + Main.ANSI_RED + Agent.JAILED + Main.ANSI_RESET + "]");
                     } else if (map[i][j].getSymbol() == Police.POLICE) {
