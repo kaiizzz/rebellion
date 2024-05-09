@@ -10,16 +10,20 @@ public class Main {
     public static final String ANSI_WHITE = "\u001B[37m";
     public static final int MAP_SIZE = 40;
     public static final int TICK = 1000;
-    public static final double GOVERNMET_LEGITIMACY = 0.1;
+    public static final int VISION = 4;
+    public static final double GOVERNMET_LEGITIMACY = 0.25;
     public static final double INITIAL_AGENT_DENSITY = 20;
-    public static final double INITIAL_POLICE_DENSITY = 20;
+    public static final double INITIAL_POLICE_DENSITY = 15;
+    
+    public static final int[][] DIRECTION_TUPLES = { {1,0}, {-1,0}, {0,1}, {0,-1}, {1,1}, {-1,-1}, {1,-1}, {-1,1} };
+
     private Entity[][] map = new Entity[MAP_SIZE][MAP_SIZE];
 
     public static void main(String[] args) {
         Main main = new Main();
 
         // insert and display initial map
-        SetUpMap setUpMap = new SetUpMap(INITIAL_AGENT_DENSITY, INITIAL_POLICE_DENSITY);
+        SetUpMap setUpMap = new SetUpMap(INITIAL_POLICE_DENSITY, INITIAL_AGENT_DENSITY);
         setUpMap.setUpMap(MAP_SIZE);
         System.out.println("Initial map:");
         setUpMap.displayMap(setUpMap.getMap());

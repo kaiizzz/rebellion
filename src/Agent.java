@@ -41,48 +41,6 @@ public class Agent extends Entity {
 
     }
 
-    // /**
-    // * Move the agent to a new position
-    // *
-    // * @param map
-    // * @param x
-    // * @param y
-    // */
-    // public void move(Entity[][] map, int x, int y) {
-    // // Select a direction to move out of 8 possible directions
-    // int[] dx = { 0, 0, 1, -1, 1, -1, 1, -1 };
-    // int[] dy = { 1, -1, 0, 0, 1, -1, -1, 1 };
-    // int direction = (int) (Math.random() * 8);
-    // int newX = x + dx[direction];
-    // int newY = y + dy[direction];
-
-    // // Check if the new position can be moved onto
-    // if (newX >= 0 && newX < map.length && newY >= 0 && newY < map[0].length &&
-    // map[newX][newY] == null) {
-    // // check is there is another entity in that space
-    // map[newX][newY] = map[x][y];
-    // map[x][y] = null;
-    // } else {
-    // // If the new position is out of bounds, move to the opposite side of the map
-    // if (newX < 0) {
-    // newX = Main.MAP_SIZE - 1;
-    // }
-    // if (newX >= Main.MAP_SIZE) {
-    // newX = 0;
-    // }
-    // if (newY < 0) {
-    // newY = Main.MAP_SIZE - 1;
-    // }
-    // if (newY >= Main.MAP_SIZE) {
-    // newY = 0;
-    // }
-    // if (map[newX][newY] == null) {
-    // map[newX][newY] = map[x][y];
-    // map[x][y] = null;
-    // }
-    // }
-    // }
-
     public void update(AgentState state) {
         this.state = state;
         if (state == AgentState.REBEL) {
@@ -119,43 +77,26 @@ public class Agent extends Entity {
     }
 
     /**
-     * Count the number of agents in the neighbourhood
+     * Count the number of agents of type in the neighbourhood
      * 
      * @param map
      * @param xpos
      * @param ypos
+     * @param agentType
      * @return count
      */
-    public int countAgentsInNeighbourhood(Entity[][] map, int xpos, int ypos) {
+    public int countAgentsInNeighbourhood(Entity[][] map, int xpos, int ypos, char agentType) {
         int count = 0;
-        if (xpos + 1 > Main.MAP_SIZE - 1) {
-            if (map[0][ypos] != null && map[0][ypos].getSymbol() == Agent.AGENT) {
-                count++;
-            }
-        } else if (xpos - 1 < 0) {
-            if (map[Main.MAP_SIZE - 1][ypos] != null && map[Main.MAP_SIZE - 1][ypos].getSymbol() == Agent.AGENT) {
-                count++;
-            }
-        } else if (ypos + 1 > Main.MAP_SIZE - 1) {
-            if (map[xpos][0] != null && map[xpos][0].getSymbol() == Agent.AGENT) {
-                count++;
-            }
-        } else if (ypos - 1 < 0) {
-            if (map[xpos][Main.MAP_SIZE - 1] != null && map[xpos][Main.MAP_SIZE - 1].getSymbol() == Agent.AGENT) {
-                count++;
-            }
-        } else {
-            int[] dx = { 1, -1, 0, 0, 1, -1, 1, -1 };
-            int[] dy = { 0, 0, 1, -1, 1, -1, -1, 1 };
-
-            for (int i = 0; i < dx.length; i++) {
-                int nx = xpos + dx[i];
-                int ny = ypos + dy[i];
-                if (map[nx][ny] != null && map[nx][ny].getSymbol() == Agent.AGENT) {
+        for (int i=0; i<Main.VISION; i++){
+            // checks each tile in vision, wrapping around x and y is map boundary is reached
+            for (int[] dir : Main.DIRECTION_TUPLES) {
+                int nx = wrapCoordinates(xpos, dir[0]*i);
+                int ny = wrapCoordinates(ypos, dir[1]*i);
+                if (map[nx][ny] != null && map[nx][ny].getSymbol() == agentType) {
                     count++;
                 }
             }
-        }
+        }  
 
         return count;
     }
@@ -170,36 +111,17 @@ public class Agent extends Entity {
      */
     public double determineArrestProbability(Entity[][] map, int xpos, int ypos) {
         // look at all adgacent tiles to see police
-        int policeCount = 0;
-        if (xpos + 1 > Main.MAP_SIZE - 1) {
-            if (map[0][ypos] != null && map[0][ypos].getSymbol() == Police.POLICE) {
-                policeCount++;
-            }
-        } else if (xpos - 1 < 0) {
-            if (map[Main.MAP_SIZE - 1][ypos] != null && map[Main.MAP_SIZE - 1][ypos].getSymbol() == Police.POLICE) {
-                policeCount++;
-            }
-        } else if (ypos + 1 > Main.MAP_SIZE - 1) {
-            if (map[xpos][0] != null && map[xpos][0].getSymbol() == Police.POLICE) {
-                policeCount++;
-            }
-        } else if (ypos - 1 < 0) {
-            if (map[xpos][Main.MAP_SIZE - 1] != null && map[xpos][Main.MAP_SIZE - 1].getSymbol() == Police.POLICE) {
-                policeCount++;
-            }
-        } else {
-            int[] dx = { 1, -1, 0, 0, 1, -1, 1, -1 };
-            int[] dy = { 0, 0, 1, -1, 1, -1, -1, 1 };
-
-            for (int i = 0; i < dx.length; i++) {
-                int nx = xpos + dx[i];
-                int ny = ypos + dy[i];
-                if (map[nx][ny] != null && map[nx][ny].getSymbol() == Police.POLICE) {
-                    policeCount++;
-                }
-            }
-        }
-
-        return (1 - Math.exp(-K * Math.floor(policeCount / (1 + countAgentsInNeighbourhood(map, xpos, ypos)))));
+        int policeCount = countAgentsInNeighbourhood(map, xpos, ypos, Police.POLICE);
+        return (1 - Math.exp(-K * Math.floor(policeCount / (1 + countAgentsInNeighbourhood(map, xpos, ypos, Agent.REBEL)))));
     }
+
+
+    int wrapCoordinates(int pos, int offset){
+        int result = (pos + offset)%Main.MAP_SIZE;
+        if(result < 0){
+            result += Main.MAP_SIZE;
+        }
+        return result;
+    }
+
 }
