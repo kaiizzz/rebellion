@@ -12,13 +12,9 @@ public class Main {
     public static final int TICK = 1000;
     public static final int VISION = 4;
     public static final double GOVERNMET_LEGITIMACY = 0.25;
-    public static final double INITIAL_AGENT_DENSITY = 20;
-    public static final double INITIAL_POLICE_DENSITY = 15;
+    public static final double INITIAL_AGENT_DENSITY = 0.001;
+    public static final double INITIAL_POLICE_DENSITY = 0;
     
-    public static final int[][] DIRECTION_TUPLES = { {1,0}, {-1,0}, {0,1}, {0,-1}, {1,1}, {-1,-1}, {1,-1}, {-1,1} };
-
-    private Entity[][] map = new Entity[MAP_SIZE][MAP_SIZE];
-
     public static void main(String[] args) {
         Main main = new Main();
 
@@ -26,10 +22,11 @@ public class Main {
         SetUpMap setUpMap = new SetUpMap(INITIAL_POLICE_DENSITY, INITIAL_AGENT_DENSITY);
         setUpMap.setUpMap(MAP_SIZE);
         System.out.println("Initial map:");
-        setUpMap.displayMap(setUpMap.getMap());
+        // setUpMap.displayMap(setUpMap.getMap());
 
         // main loop
         int steps = 1;
+        
         while (true) {
 
             // do nest step
@@ -59,16 +56,10 @@ public class Main {
     public void step(Entity[][] map) {
         for (int i = 0; i < MAP_SIZE; i++) {
             for (int j = 0; j < MAP_SIZE; j++) {
-                if (map[i][j] != null
-                        && (map[i][j].getSymbol() == Agent.AGENT || map[i][j].getSymbol() == Agent.REBEL)) {
-                    Agent agent = (Agent) map[i][j];
-                    agent.move(map, i, j);
-                }
-                if (map[i][j] != null && map[i][j].getSymbol() == Police.POLICE) {
-                    Police police = (Police) map[i][j];
-                    police.move(map, i, j);
+                if (map[i][j] != null){
+                    map[i][j].move(map, i, j);
                 }
             }
-        }
+        }    
     }
 }

@@ -24,7 +24,7 @@ public class Agent extends Entity {
 
     // Initialize the variables for the agent
     private double percievedHardship;
-    private double greivance;
+    private double grievance;
     private double riskAversion;
 
     public Agent() {
@@ -37,7 +37,7 @@ public class Agent extends Entity {
         this.riskAversion = Math.random();
 
         // greivance calculation
-        this.greivance = this.percievedHardship * (1 - Main.GOVERNMET_LEGITIMACY);
+        this.grievance = this.percievedHardship * (1 - Main.GOVERNMET_LEGITIMACY);
 
     }
 
@@ -48,6 +48,12 @@ public class Agent extends Entity {
         } else if (state == AgentState.JAILED) {
             this.setSymbol(JAILED);
         }
+    }
+
+    public  String toString(){
+        
+        return ("percived hardship: " + percievedHardship + " " + "risk aversion: " + riskAversion);
+        
     }
 
     /**
@@ -63,7 +69,7 @@ public class Agent extends Entity {
         // determineArrestProbability(map, x, y)) > REBEL_THRESHOLD); // uncomment for
         // debugging
 
-        if ((this.greivance - this.riskAversion * determineArrestProbability(map, x, y)) > REBEL_THRESHOLD) {
+        if ((this.grievance - this.riskAversion * determineArrestProbability(map, x, y)) > REBEL_THRESHOLD) {
             this.state = AgentState.REBEL;
             // this.symbol = REBEL;
             // System.out.println(super.getSymbol());
@@ -87,11 +93,15 @@ public class Agent extends Entity {
      */
     public int countAgentsInNeighbourhood(Entity[][] map, int xpos, int ypos, char agentType) {
         int count = 0;
-        for (int i=0; i<Main.VISION; i++){
-            // checks each tile in vision, wrapping around x and y is map boundary is reached
-            for (int[] dir : Main.DIRECTION_TUPLES) {
-                int nx = wrapCoordinates(xpos, dir[0]*i);
-                int ny = wrapCoordinates(ypos, dir[1]*i);
+        // checks each tile in vision, wrapping around x and y is map boundary is reached
+        //System.out.println("position: (" + xpos + ", " + ypos + ")");
+        for (int i = xpos - Main.VISION; i<= xpos + Main.VISION; i++){
+            for (int j = ypos - Main.VISION; j <= ypos + Main.VISION; j++){
+                if(i == xpos && j == ypos){
+                    continue;
+                }
+                int nx = wrapCoordinates(i);
+                int ny = wrapCoordinates(j);
                 if (map[nx][ny] != null && map[nx][ny].getSymbol() == agentType) {
                     count++;
                 }
@@ -113,15 +123,6 @@ public class Agent extends Entity {
         // look at all adgacent tiles to see police
         int policeCount = countAgentsInNeighbourhood(map, xpos, ypos, Police.POLICE);
         return (1 - Math.exp(-K * Math.floor(policeCount / (1 + countAgentsInNeighbourhood(map, xpos, ypos, Agent.REBEL)))));
-    }
-
-
-    int wrapCoordinates(int pos, int offset){
-        int result = (pos + offset)%Main.MAP_SIZE;
-        if(result < 0){
-            result += Main.MAP_SIZE;
-        }
-        return result;
     }
 
 }

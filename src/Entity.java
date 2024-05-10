@@ -1,3 +1,7 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class Entity {
     protected char symbol;
 
@@ -14,37 +18,26 @@ public class Entity {
      * @param y
      */
     public void move(Entity[][] map, int x, int y) {
-        // Select a direction to move out of 8 possible directions
-        int[] dx = { 0, 0, 1, -1, 1, -1, 1, -1 };
-        int[] dy = { 1, -1, 0, 0, 1, -1, -1, 1 };
-        int direction = (int) (Math.random() * 8);
-        int newX = x + dx[direction];
-        int newY = y + dy[direction];
-
-        // Check if the new position can be moved onto
-        if (newX >= 0 && newX < map.length && newY >= 0 && newY < map[0].length && map[newX][newY] == null) {
-            // check is there is another entity in that space
-            map[newX][newY] = map[x][y];
-            map[x][y] = null;
-        } else {
-            // If the new position is out of bounds, move to the opposite side of the map
-            if (newX < 0) {
-                newX = Main.MAP_SIZE - 1;
-            }
-            if (newX >= Main.MAP_SIZE) {
-                newX = 0;
-            }
-            if (newY < 0) {
-                newY = Main.MAP_SIZE - 1;
-            }
-            if (newY >= Main.MAP_SIZE) {
-                newY = 0;
-            }
-            if (map[newX][newY] == null) {
-                map[newX][newY] = map[x][y];
-                map[x][y] = null;
+        ArrayList<List<Integer>> emptyTiles = new ArrayList<List<Integer>>();
+        // find all empty tiles within vision range
+        for (int i = x - Main.VISION; i<= x + Main.VISION; i++){
+            for (int j = y - Main.VISION; j <= y + Main.VISION; j++){
+                if(i == x && j == y){
+                    continue;
+                }
+                int nx = wrapCoordinates(i);
+                int ny = wrapCoordinates(j);
+                if (map[nx][ny] == null) {
+                    emptyTiles.add(Arrays.asList(nx, ny));
+                }
             }
         }
+        // randomly select one empty tile to move to
+        int tile = (int) (Math.random()*emptyTiles.size());
+        List<Integer> newTile = emptyTiles.get(tile);
+        map[newTile.get(0)][newTile.get(1)] = map[x][y];
+        map[x][y] = null;
+        
     }
 
     public char getSymbol() {
@@ -54,4 +47,14 @@ public class Entity {
     public void setSymbol(char symbol) {
         this.symbol = symbol;
     }
+
+    // helper function to wrap coordinates that go out of map bounds to other side of map
+    int wrapCoordinates(int pos){
+        int result = pos%Main.MAP_SIZE;
+        if(result < 0){
+            result += Main.MAP_SIZE;
+        }
+        return result;
+    }
+
 }

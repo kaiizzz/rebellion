@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class SetUpMap {
@@ -36,6 +35,7 @@ public class SetUpMap {
         System.out.println("Number of agents: " + numberOfAgents);
         for (int i = 0; i < numberOfAgents; i++) {
             agents.add(new Agent());
+            
         }
 
         placeEntities(cops, mapSize, map, initialCopDensity);
@@ -43,29 +43,27 @@ public class SetUpMap {
     }
 
     private void placeEntities(ArrayList<Entity> entities, int mapSize, Entity[][] map, double density) {
-        int entitiesCount = entities.size();
-        for (Entity entity : entities) {
-            try {
-                while (entitiesCount > 0) {
-                    for (int i = 0; i < mapSize; i++) {
-                        for (int j = 0; j < mapSize; j++) {
-                            if (map[i][j] == null && entitiesCount > 0) {
-                                // 5-% chance of placing entity
-                                if (Math.random() > 0.995) {
-                                    map[i][j] = entity;
-                                    entitiesCount--;
-                                }
-                            } else {
-                                continue;
+        try {
+            Entity entity;
+            while (!entities.isEmpty()) {
+                entity = entities.get(0);
+                for (int i = 0; i < mapSize; i++) {
+                    for (int j = 0; j < mapSize; j++) {
+                        if (map[i][j] == null) {
+                            // 5-% chance of placing entity
+                            if (Math.random() > 0.995) {
+                                map[i][j] = entity;
+                                entities.remove(0);
                             }
-                        }
-                        // System.out.println();
+                        } 
                     }
+                    // System.out.println();
                 }
-            } catch (Exception e) {
-                System.out.println("Error placing entity");
             }
+        } catch (Exception e) {
+            System.out.println("Error placing entity");
         }
+        
     }
 
     public void displayMap(Entity[][] map) {
@@ -75,19 +73,6 @@ public class SetUpMap {
                 if (map[i][j] == null) {
                     System.out.print("[ ]");
                 } else {
-                    // if (map[i][j].getSymbol() == Agent.AGENT) {
-                    // System.out.print("[" + Main.ANSI_GREEN + Agent.AGENT + Main.ANSI_RESET +
-                    // "]");
-                    // } else if (map[i][j].getSymbol() == Police.POLICE) {
-                    // System.out.print("[" + Main.ANSI_BLUE + Police.POLICE + Main.ANSI_RESET +
-                    // "]");
-                    // } else if (map[i][j].getSymbol() == Agent.REBEL) {
-                    // System.out.print("[" + Main.ANSI_RED + Agent.REBEL + Main.ANSI_RESET + "]");
-                    // } else if (map[i][j].getSymbol() == Agent.JAILED) {
-                    // System.out.print("[" + Main.ANSI_PURPLE + Agent.JAILED + Main.ANSI_RESET +
-                    // "]");
-                    // }
-
                     if (map[i][j].getSymbol() == Agent.AGENT || map[i][j].getSymbol() == Agent.REBEL) {
                         Agent agent = (Agent) map[i][j];
                         if (agent.rebel(this.map, i, j)) {
