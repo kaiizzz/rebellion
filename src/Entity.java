@@ -25,8 +25,8 @@ public class Entity {
                 if(i == x && j == y){
                     continue;
                 }
-                int nx = wrapCoordinates(i);
-                int ny = wrapCoordinates(j);
+                int nx = SetUpMap.wrapCoordinates(i);
+                int ny = SetUpMap.wrapCoordinates(j);
                 if (map[nx][ny] == null) {
                     emptyTiles.add(Arrays.asList(nx, ny));
                 }
@@ -48,13 +48,6 @@ public class Entity {
         this.symbol = symbol;
     }
 
-    // helper function to wrap coordinates that go out of map bounds to other side of map
-    int wrapCoordinates(int pos){
-        int result = pos%Main.MAP_SIZE;
-        if(result < 0){
-            result += Main.MAP_SIZE;
-        }
-        return result;
-    }
+    
 
 }

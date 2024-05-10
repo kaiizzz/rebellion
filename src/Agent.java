@@ -100,8 +100,8 @@ public class Agent extends Entity {
                 if(i == xpos && j == ypos){
                     continue;
                 }
-                int nx = wrapCoordinates(i);
-                int ny = wrapCoordinates(j);
+                int nx = SetUpMap.wrapCoordinates(i);
+                int ny = SetUpMap.wrapCoordinates(j);
                 if (map[nx][ny] != null && map[nx][ny].getSymbol() == agentType) {
                     count++;
                 }

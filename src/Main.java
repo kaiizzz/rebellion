@@ -12,8 +12,8 @@ public class Main {
     public static final int TICK = 1000;
     public static final int VISION = 4;
     public static final double GOVERNMET_LEGITIMACY = 0.25;
-    public static final double INITIAL_AGENT_DENSITY = 0.001;
-    public static final double INITIAL_POLICE_DENSITY = 0;
+    public static final double INITIAL_AGENT_DENSITY = 10;
+    public static final double INITIAL_POLICE_DENSITY = 5;
     
     public static void main(String[] args) {
         Main main = new Main();
@@ -22,7 +22,7 @@ public class Main {
         SetUpMap setUpMap = new SetUpMap(INITIAL_POLICE_DENSITY, INITIAL_AGENT_DENSITY);
         setUpMap.setUpMap(MAP_SIZE);
         System.out.println("Initial map:");
-        // setUpMap.displayMap(setUpMap.getMap());
+        setUpMap.displayMap(setUpMap.getMap());
 
         // main loop
         int steps = 1;

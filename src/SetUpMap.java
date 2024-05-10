@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class SetUpMap {
     private double initialCopDensity;
@@ -43,25 +45,28 @@ public class SetUpMap {
     }
 
     private void placeEntities(ArrayList<Entity> entities, int mapSize, Entity[][] map, double density) {
-        try {
-            Entity entity;
-            while (!entities.isEmpty()) {
-                entity = entities.get(0);
-                for (int i = 0; i < mapSize; i++) {
-                    for (int j = 0; j < mapSize; j++) {
-                        if (map[i][j] == null) {
-                            // 5-% chance of placing entity
-                            if (Math.random() > 0.995) {
-                                map[i][j] = entity;
-                                entities.remove(0);
-                            }
-                        } 
-                    }
-                    // System.out.println();
+        // gets coordinates of all empty tiles in entire map (can probably create one function to do this for both Entity.move and SetUpMap)
+        ArrayList<List<Integer>> emptyTiles = new ArrayList<List<Integer>>();
+        for (int i = 0; i < mapSize; i++){
+            for (int j = 0; j < mapSize; j++){
+                if (map[i][j] == null) {
+                    emptyTiles.add(Arrays.asList(i, j));
                 }
             }
+        }
+        try {
+            Entity entity;
+            // places entities randomly in unoccupied
+            while (!entities.isEmpty()) {
+                entity = entities.get(0);
+                int random = (int) (Math.random()*emptyTiles.size());
+                List<Integer> tile = emptyTiles.get(random);
+                map[tile.get(0)][tile.get(1)] = entity;
+                emptyTiles.remove(random);
+                entities.remove(entity);
+            }
         } catch (Exception e) {
-            System.out.println("Error placing entity");
+            System.out.println("Error placing entities");
         }
         
     }
@@ -102,6 +107,16 @@ public class SetUpMap {
 
     public void set2(int i, int j, char symbol) {
         this.map[i][j].setSymbol(symbol);
+    }
+    
+
+    // helper function to wrap coordinates that go out of map bounds to other side of map
+    public static int wrapCoordinates(int pos){
+        int result = pos%Main.MAP_SIZE;
+        if(result < 0){
+            result += Main.MAP_SIZE;
+        }
+        return result;
     }
 
 }
