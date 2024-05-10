@@ -2,19 +2,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class SetUpMap {
+// Todo: make this class a proper singleton
+public class WorldMap {
     private double initialCopDensity;
     private double initialAgentDensity;
 
     private int numberOfAgents;
-    private ArrayList<Entity> agents = new ArrayList<Entity>();
+    private static ArrayList<Entity> agents = new ArrayList<Entity>();
 
     private int numberOfCops;
-    private ArrayList<Entity> cops = new ArrayList<Entity>();
+    private static ArrayList<Entity> cops = new ArrayList<Entity>();
 
     private Entity[][] map;
 
-    public SetUpMap(double d, double e) {
+    public WorldMap(double d, double e) {
         this.initialCopDensity = d;
         this.initialAgentDensity = e;
         if (this.initialCopDensity + this.initialAgentDensity > 100) {
@@ -39,13 +40,12 @@ public class SetUpMap {
             agents.add(new Agent());
             
         }
-
         placeEntities(cops, mapSize, map, initialCopDensity);
         placeEntities(agents, mapSize, map, initialAgentDensity);
     }
 
     private void placeEntities(ArrayList<Entity> entities, int mapSize, Entity[][] map, double density) {
-        // gets coordinates of all empty tiles in entire map (can probably create one function to do this for both Entity.move and SetUpMap)
+        // gets coordinates of all empty tiles in entire map (can probably create one function to do this for both Entity.move and WorldMap)
         ArrayList<List<Integer>> emptyTiles = new ArrayList<List<Integer>>();
         for (int i = 0; i < mapSize; i++){
             for (int j = 0; j < mapSize; j++){
@@ -54,16 +54,17 @@ public class SetUpMap {
                 }
             }
         }
+        List<Entity> remEntities = new ArrayList<>(entities);
         try {
             Entity entity;
             // places entities randomly in unoccupied
-            while (!entities.isEmpty()) {
-                entity = entities.get(0);
+            while (!remEntities.isEmpty()) {
+                entity = remEntities.get(0);
                 int random = (int) (Math.random()*emptyTiles.size());
                 List<Integer> tile = emptyTiles.get(random);
                 map[tile.get(0)][tile.get(1)] = entity;
                 emptyTiles.remove(random);
-                entities.remove(entity);
+                remEntities.remove(entity);
             }
         } catch (Exception e) {
             System.out.println("Error placing entities");
@@ -77,20 +78,18 @@ public class SetUpMap {
             for (int j = 0; j < Main.MAP_SIZE; j++) {
                 if (map[i][j] == null) {
                     System.out.print("[ ]");
-                } else {
-                    if (map[i][j].getSymbol() == Agent.AGENT || map[i][j].getSymbol() == Agent.REBEL) {
-                        Agent agent = (Agent) map[i][j];
-                        if (agent.rebel(this.map, i, j)) {
-                            System.out.print("[" + Main.ANSI_RED + Agent.REBEL + Main.ANSI_RESET + "]");
-                        } else {
-                            System.out.print("[" + Main.ANSI_GREEN + Agent.AGENT + Main.ANSI_RESET + "]");
-                        }
-
-                    } else if (map[i][j].getSymbol() == Agent.JAILED) {
-                        System.out.print("[" + Main.ANSI_RED + Agent.JAILED + Main.ANSI_RESET + "]");
-                    } else if (map[i][j].getSymbol() == Police.POLICE) {
-                        System.out.print("[" + Main.ANSI_BLUE + Police.POLICE + Main.ANSI_RESET + "]");
+                } 
+                else {
+                    char symbol = map[i][j].getSymbol();
+                    String color = Main.ANSI_GREEN;
+                    if (symbol == Agent.JAILED) {
+                        color = Main.ANSI_PURPLE;
+                    } else if (symbol == Police.POLICE) {
+                        color = Main.ANSI_BLUE;
+                    } else if (symbol == Agent.REBEL){
+                        color = Main.ANSI_RED;
                     }
+                    System.out.print("[" + color + symbol + Main.ANSI_RESET + "]");
                 }
             }
             System.out.println();
@@ -117,6 +116,14 @@ public class SetUpMap {
             result += Main.MAP_SIZE;
         }
         return result;
+    }
+
+    public static List<Entity> getAgents(){
+        return agents;
+    }
+
+    public static List<Entity> getPolice(){
+        return cops;
     }
 
 }

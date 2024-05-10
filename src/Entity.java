@@ -4,6 +4,8 @@ import java.util.List;
 
 public class Entity {
     protected char symbol;
+    private int xpos;
+    private int ypos;
 
     public Entity(char symbol) {
         // System.out.println("Entity created");
@@ -25,17 +27,22 @@ public class Entity {
                 if(i == x && j == y){
                     continue;
                 }
-                int nx = SetUpMap.wrapCoordinates(i);
-                int ny = SetUpMap.wrapCoordinates(j);
+                int nx = WorldMap.wrapCoordinates(i);
+                int ny = WorldMap.wrapCoordinates(j);
                 if (map[nx][ny] == null) {
                     emptyTiles.add(Arrays.asList(nx, ny));
                 }
             }
         }
         // randomly select one empty tile to move to
+        if(emptyTiles.size() == 0){
+            return;
+        }
         int tile = (int) (Math.random()*emptyTiles.size());
         List<Integer> newTile = emptyTiles.get(tile);
         map[newTile.get(0)][newTile.get(1)] = map[x][y];
+        this.xpos = newTile.get(0);
+        this.ypos = newTile.get(1); 
         map[x][y] = null;
         
     }
@@ -48,6 +55,12 @@ public class Entity {
         this.symbol = symbol;
     }
 
-    
+    public int getXpos() {
+        return xpos;
+    }
+
+    public int getYpos() {
+        return ypos;
+    }
 
 }

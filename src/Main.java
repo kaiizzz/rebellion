@@ -11,7 +11,7 @@ public class Main {
     public static final int MAP_SIZE = 40;
     public static final int TICK = 1000;
     public static final int VISION = 4;
-    public static final double GOVERNMET_LEGITIMACY = 0.25;
+    public static final double GOVERNMET_LEGITIMACY = 0.8;
     public static final double INITIAL_AGENT_DENSITY = 10;
     public static final double INITIAL_POLICE_DENSITY = 5;
     
@@ -19,10 +19,10 @@ public class Main {
         Main main = new Main();
 
         // insert and display initial map
-        SetUpMap setUpMap = new SetUpMap(INITIAL_POLICE_DENSITY, INITIAL_AGENT_DENSITY);
-        setUpMap.setUpMap(MAP_SIZE);
+        WorldMap WorldMap = new WorldMap(INITIAL_POLICE_DENSITY, INITIAL_AGENT_DENSITY);
+        WorldMap.setUpMap(MAP_SIZE);
         System.out.println("Initial map:");
-        setUpMap.displayMap(setUpMap.getMap());
+        // WorldMap.displayMap(WorldMap.getMap());
 
         // main loop
         int steps = 1;
@@ -30,12 +30,12 @@ public class Main {
         while (true) {
 
             // do nest step
-            main.step(setUpMap.getMap());
+            main.step(WorldMap.getMap());
             System.out.println();
             System.out.println("Step " + steps + ":");
 
             // display map
-            setUpMap.displayMap(setUpMap.getMap());
+            WorldMap.displayMap(WorldMap.getMap());
 
             // sleep for a while
             try {
@@ -54,12 +54,25 @@ public class Main {
      * @param map
      */
     public void step(Entity[][] map) {
+        // move rule
         for (int i = 0; i < MAP_SIZE; i++) {
             for (int j = 0; j < MAP_SIZE; j++) {
                 if (map[i][j] != null){
                     map[i][j].move(map, i, j);
                 }
             }
+        }
+        // agent rule
+        // ugly cast to Agent as agents in WorldMap is List<Entities>
+        // perhaps change placeEntities function later so agents can be List<Agent> 
+        for (Entity entity : WorldMap.getAgents()){
+            Agent agent = (Agent) entity;
+            agent.determineArrestProbability(map, agent.getXpos(), agent.getYpos());
+        }
+        // 
+        for (Entity entity : WorldMap.getAgents()){
+            Agent agent = (Agent) entity;
+            agent.attemptRebellion(map, agent.getXpos(), agent.getYpos());
         }    
     }
 }

@@ -26,6 +26,7 @@ public class Agent extends Entity {
     private double percievedHardship;
     private double grievance;
     private double riskAversion;
+    private double arrestProbability;
 
     public Agent() {
         super(AGENT);
@@ -38,6 +39,8 @@ public class Agent extends Entity {
 
         // greivance calculation
         this.grievance = this.percievedHardship * (1 - Main.GOVERNMET_LEGITIMACY);
+
+        this.arrestProbability = 1;
 
     }
 
@@ -64,21 +67,15 @@ public class Agent extends Entity {
      * @param y
      * @return
      */
-    public Boolean rebel(Entity[][] map, int x, int y) {
+    public void attemptRebellion(Entity[][] map, int x, int y) {
         // System.out.println((this.greivance - this.riskAversion *
         // determineArrestProbability(map, x, y)) > REBEL_THRESHOLD); // uncomment for
         // debugging
+        if ((this.grievance - this.riskAversion * arrestProbability) > REBEL_THRESHOLD) {
+            update(AgentState.REBEL);
 
-        if ((this.grievance - this.riskAversion * determineArrestProbability(map, x, y)) > REBEL_THRESHOLD) {
-            this.state = AgentState.REBEL;
-            // this.symbol = REBEL;
-            // System.out.println(super.getSymbol());
-            return true;
         } else {
-            this.state = AgentState.NORMAL;
-            // this.symbol = AGENT;
-            // System.out.println(super.getSymbol());
-            return false;
+            update(AgentState.NORMAL);
         }
     }
 
@@ -100,8 +97,8 @@ public class Agent extends Entity {
                 if(i == xpos && j == ypos){
                     continue;
                 }
-                int nx = SetUpMap.wrapCoordinates(i);
-                int ny = SetUpMap.wrapCoordinates(j);
+                int nx = WorldMap.wrapCoordinates(i);
+                int ny = WorldMap.wrapCoordinates(j);
                 if (map[nx][ny] != null && map[nx][ny].getSymbol() == agentType) {
                     count++;
                 }
@@ -119,10 +116,10 @@ public class Agent extends Entity {
      * @param ypos
      * @return probability
      */
-    public double determineArrestProbability(Entity[][] map, int xpos, int ypos) {
+    public void determineArrestProbability(Entity[][] map, int xpos, int ypos) {
         // look at all adgacent tiles to see police
         int policeCount = countAgentsInNeighbourhood(map, xpos, ypos, Police.POLICE);
-        return (1 - Math.exp(-K * Math.floor(policeCount / (1 + countAgentsInNeighbourhood(map, xpos, ypos, Agent.REBEL)))));
+        this.arrestProbability = (1 - Math.exp(-K * Math.floor(policeCount / (1 + countAgentsInNeighbourhood(map, xpos, ypos, Agent.REBEL)))));
     }
 
 }
