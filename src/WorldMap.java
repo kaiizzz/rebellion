@@ -8,12 +8,13 @@ public class WorldMap {
     private double initialAgentDensity;
 
     private int numberOfAgents;
-    private static ArrayList<Entity> agents = new ArrayList<Entity>();
+    private static ArrayList<Entity> activeAgents = new ArrayList<>();
+    private static ArrayList<Agent> jailedAgents = new ArrayList<>();
 
     private int numberOfCops;
-    private static ArrayList<Entity> cops = new ArrayList<Entity>();
+    private static ArrayList<Entity> cops = new ArrayList<>();
 
-    private Entity[][] map;
+    private Tile[][] map;
 
     public WorldMap(double d, double e) {
         this.initialCopDensity = d;
@@ -22,7 +23,12 @@ public class WorldMap {
             System.out.println("Density exceeds 100%");
             System.exit(0);
         }
-        this.map = new Entity[Main.MAP_SIZE][Main.MAP_SIZE];
+        this.map = new Tile[Main.MAP_SIZE][Main.MAP_SIZE];
+        for (int i=0; i<Main.MAP_SIZE; i++){
+            for (int j=0; j<Main.MAP_SIZE; j++){
+                map[i][j] = new Tile(i, j);
+            }
+        }
     }
 
     public void setUpMap(int mapSize) {
@@ -37,19 +43,19 @@ public class WorldMap {
         numberOfAgents = (int) Math.ceil(initialAgentDensity * 0.01 * mapSize * mapSize);
         System.out.println("Number of agents: " + numberOfAgents);
         for (int i = 0; i < numberOfAgents; i++) {
-            agents.add(new Agent());
+            activeAgents.add(new Agent());
             
         }
-        placeEntities(cops, mapSize, map, initialCopDensity);
-        placeEntities(agents, mapSize, map, initialAgentDensity);
+        placeEntities(cops, mapSize, initialCopDensity);
+        placeEntities(activeAgents, mapSize, initialAgentDensity);
     }
 
-    private void placeEntities(ArrayList<Entity> entities, int mapSize, Entity[][] map, double density) {
+    private void placeEntities(ArrayList<Entity> entities, int mapSize, double density) {
         // gets coordinates of all empty tiles in entire map (can probably create one function to do this for both Entity.move and WorldMap)
         ArrayList<List<Integer>> emptyTiles = new ArrayList<List<Integer>>();
         for (int i = 0; i < mapSize; i++){
             for (int j = 0; j < mapSize; j++){
-                if (map[i][j] == null) {
+                if(map[i][j].getActiveEntity() == null){
                     emptyTiles.add(Arrays.asList(i, j));
                 }
             }
@@ -62,7 +68,8 @@ public class WorldMap {
                 entity = remEntities.get(0);
                 int random = (int) (Math.random()*emptyTiles.size());
                 List<Integer> tile = emptyTiles.get(random);
-                map[tile.get(0)][tile.get(1)] = entity;
+                map[tile.get(0)][tile.get(1)].setActiveEntity(entity);
+                entity.setCoords(tile.get(0), tile.get(1));
                 emptyTiles.remove(random);
                 remEntities.remove(entity);
             }
@@ -72,15 +79,13 @@ public class WorldMap {
         
     }
 
-    public void displayMap(Entity[][] map) {
+    public void displayMap() {
         // display map
         for (int i = 0; i < Main.MAP_SIZE; i++) {
             for (int j = 0; j < Main.MAP_SIZE; j++) {
-                if (map[i][j] == null) {
-                    System.out.print("[ ]");
-                } 
-                else {
-                    char symbol = map[i][j].getSymbol();
+                Tile tile = map[i][j];
+                if (!(tile.getActiveEntity() == null)){
+                    char symbol = tile.getActiveEntity().getSymbol();
                     String color = Main.ANSI_GREEN;
                     if (symbol == Agent.JAILED) {
                         color = Main.ANSI_PURPLE;
@@ -89,25 +94,29 @@ public class WorldMap {
                     } else if (symbol == Agent.REBEL){
                         color = Main.ANSI_RED;
                     }
-                    System.out.print("[" + color + symbol + Main.ANSI_RESET + "]");
+                    // highlight cells that have jailed agents purple
+                    if (tile.jailOccupied()){
+                        System.out.print(Main.ANSI_PURPLE + "[" + color + symbol + Main.ANSI_PURPLE + "]" + Main.ANSI_RESET);
+                    }
+                    else {
+                        System.out.print(color + "[" + symbol + "]" +  Main.ANSI_RESET);
+                    }
+                }
+                else if (tile.jailOccupied()) {
+                    System.out.print(Main.ANSI_PURPLE + "[" + "J" + "]" + Main.ANSI_RESET);
+                } 
+                
+                else {
+                    System.out.print("[ ]");
                 }
             }
             System.out.println();
         }
     }
 
-    public Entity[][] getMap() {
-        return this.map;
+    public Tile[][] getMap() {
+        return map;
     }
-
-    public void set(int i, int j, Entity entity) {
-        this.map[i][j] = entity;
-    }
-
-    public void set2(int i, int j, char symbol) {
-        this.map[i][j].setSymbol(symbol);
-    }
-    
 
     // helper function to wrap coordinates that go out of map bounds to other side of map
     public static int wrapCoordinates(int pos){
@@ -118,12 +127,22 @@ public class WorldMap {
         return result;
     }
 
-    public static List<Entity> getAgents(){
-        return agents;
+    public static void addJailedAgent(Agent agent){
+        jailedAgents.add(agent);
+        activeAgents.remove(agent);
+    }
+
+    public static List<Entity> getActiveAgents(){
+        return activeAgents;
     }
 
     public static List<Entity> getPolice(){
         return cops;
     }
+
+    public static ArrayList<Agent> getJailedAgents() {
+        return jailedAgents;
+    }
+
 
 }

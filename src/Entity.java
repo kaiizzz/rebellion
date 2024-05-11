@@ -1,11 +1,9 @@
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class Entity {
     protected char symbol;
-    private int xpos;
-    private int ypos;
+    protected int xpos;
+    protected int ypos;
 
     public Entity(char symbol) {
         // System.out.println("Entity created");
@@ -19,31 +17,42 @@ public class Entity {
      * @param x
      * @param y
      */
-    public void move(Entity[][] map, int x, int y) {
-        ArrayList<List<Integer>> emptyTiles = new ArrayList<List<Integer>>();
+    public void move(Tile[][] map, int x, int y) {
+        ArrayList<Tile> emptyTiles = new ArrayList<>();
         // find all empty tiles within vision range
         for (int i = x - Main.VISION; i<= x + Main.VISION; i++){
             for (int j = y - Main.VISION; j <= y + Main.VISION; j++){
                 if(i == x && j == y){
                     continue;
                 }
-                int nx = WorldMap.wrapCoordinates(i);
-                int ny = WorldMap.wrapCoordinates(j);
-                if (map[nx][ny] == null) {
-                    emptyTiles.add(Arrays.asList(nx, ny));
+                int wrappedX = WorldMap.wrapCoordinates(i);
+                int wrappedY = WorldMap.wrapCoordinates(j);
+                if (map[wrappedX][wrappedY].getActiveEntity() == null) {
+                    emptyTiles.add(map[wrappedX][wrappedY]);
                 }
             }
         }
-        // randomly select one empty tile to move to
+        
         if(emptyTiles.size() == 0){
             return;
         }
-        int tile = (int) (Math.random()*emptyTiles.size());
-        List<Integer> newTile = emptyTiles.get(tile);
-        map[newTile.get(0)][newTile.get(1)] = map[x][y];
-        this.xpos = newTile.get(0);
-        this.ypos = newTile.get(1); 
-        map[x][y] = null;
+
+        // randomly select one empty tile and move to it
+        int random = (int) (Math.random()*emptyTiles.size());
+        Tile newTile = emptyTiles.get(random);
+        newTile.setActiveEntity(this);
+        setCoords(newTile.getX(), newTile.getY());
+
+        // if moving entity is in jail, remove from old tile's jail
+        if (map[x][y].getJailedEntities().contains(this)){
+            map[x][y].freeJailedAgent(this);
+            return;
+        }
+        
+        // if moving entity was active, instead remove it from old tile
+        map[x][y].setActiveEntity(null);
+        if (this instanceof Police){
+        }
         
     }
 
@@ -61,6 +70,11 @@ public class Entity {
 
     public int getYpos() {
         return ypos;
+    }
+
+    public void setCoords (int x, int y){
+        this.xpos = x;
+        this.ypos = y;
     }
 
 }

@@ -27,6 +27,7 @@ public class Agent extends Entity {
     private double grievance;
     private double riskAversion;
     private double arrestProbability;
+    private int jailTerm;
 
     public Agent() {
         super(AGENT);
@@ -40,7 +41,7 @@ public class Agent extends Entity {
         // greivance calculation
         this.grievance = this.percievedHardship * (1 - Main.GOVERNMET_LEGITIMACY);
 
-        this.arrestProbability = 1;
+        //this.arrestProbability = 1;
 
     }
 
@@ -48,6 +49,8 @@ public class Agent extends Entity {
         this.state = state;
         if (state == AgentState.REBEL) {
             this.setSymbol(REBEL);
+        } else if (state == AgentState.NORMAL){
+            this.setSymbol(AGENT);
         } else if (state == AgentState.JAILED) {
             this.setSymbol(JAILED);
         }
@@ -67,16 +70,17 @@ public class Agent extends Entity {
      * @param y
      * @return
      */
-    public void attemptRebellion(Entity[][] map, int x, int y) {
-        // System.out.println((this.greivance - this.riskAversion *
-        // determineArrestProbability(map, x, y)) > REBEL_THRESHOLD); // uncomment for
+    public void checkRebellion(Tile[][] map, int x, int y) {
+        //System.out.println((this.grievance - this.riskAversion * arrestProbability) ); // uncomment for
         // debugging
-        if ((this.grievance - this.riskAversion * arrestProbability) > REBEL_THRESHOLD) {
+
+        if ((this.grievance - (this.riskAversion * this.arrestProbability)) > REBEL_THRESHOLD) {
             update(AgentState.REBEL);
 
         } else {
             update(AgentState.NORMAL);
         }
+
     }
 
     /**
@@ -88,18 +92,15 @@ public class Agent extends Entity {
      * @param agentType
      * @return count
      */
-    public int countAgentsInNeighbourhood(Entity[][] map, int xpos, int ypos, char agentType) {
+    public int countAgentsInNeighbourhood(Tile[][] map, int xpos, int ypos, char agentType) {
         int count = 0;
         // checks each tile in vision, wrapping around x and y is map boundary is reached
         //System.out.println("position: (" + xpos + ", " + ypos + ")");
         for (int i = xpos - Main.VISION; i<= xpos + Main.VISION; i++){
             for (int j = ypos - Main.VISION; j <= ypos + Main.VISION; j++){
-                if(i == xpos && j == ypos){
-                    continue;
-                }
                 int nx = WorldMap.wrapCoordinates(i);
                 int ny = WorldMap.wrapCoordinates(j);
-                if (map[nx][ny] != null && map[nx][ny].getSymbol() == agentType) {
+                if (map[nx][ny].getActiveEntity() != null && map[nx][ny].getActiveEntity().getSymbol() == agentType) {
                     count++;
                 }
             }
@@ -116,10 +117,27 @@ public class Agent extends Entity {
      * @param ypos
      * @return probability
      */
-    public void determineArrestProbability(Entity[][] map, int xpos, int ypos) {
+    public void determineArrestProbability(Tile[][] map, int xpos, int ypos) {
         // look at all adgacent tiles to see police
         int policeCount = countAgentsInNeighbourhood(map, xpos, ypos, Police.POLICE);
-        this.arrestProbability = (1 - Math.exp(-K * Math.floor(policeCount / (1 + countAgentsInNeighbourhood(map, xpos, ypos, Agent.REBEL)))));
+        int agentCount = 1 + (1 + countAgentsInNeighbourhood(map, xpos, ypos, Agent.REBEL));
+        this.arrestProbability = (1 - Math.exp(-K * Math.floor(policeCount / agentCount)));
+    }
+
+    public void setJailTerm(int term) {
+        this.jailTerm = term;
+    }
+
+    public void decrementJailTerm() {
+        this.jailTerm -= 1;
+    }
+
+    public boolean attemptFree() {
+        if (this.jailTerm > 0){
+            return false;
+        }
+        update(AgentState.NORMAL);
+        return true;
     }
 
 }
