@@ -75,10 +75,19 @@ public class Agent extends Entity {
         // debugging
 
         if ((this.grievance - (this.riskAversion * this.arrestProbability)) > REBEL_THRESHOLD) {
+            if (state == AgentState.NORMAL){
+                WorldMap.getRebellingAgents().add(this);  
+            }
             update(AgentState.REBEL);
+            
+            
 
         } else {
+            if (state == AgentState.REBEL){
+                WorldMap.getRebellingAgents().remove(this);
+            }
             update(AgentState.NORMAL);
+            
         }
 
     }

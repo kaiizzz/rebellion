@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -13,7 +14,7 @@ public class Main {
     public static final double INITIAL_POLICE_DENSITY = 4; // The initial density of police in the map
     // IMPORTANT: INITIAL_AGENT_DENSITY + INITIAL_POLICE_DENSITY should be less than
     // 100
-    public static final int MAX_JAIL_TERM = 10; // The maximum jail term for agents
+    public static final int MAX_JAIL_TERM = 30; // The maximum jail term for agents
 
     // color constants
     public static final String ANSI_RESET = "\u001B[0m";
@@ -30,12 +31,12 @@ public class Main {
     public static final int MAP_SIZE = 40;
 
     // speed of simulation (higher number is slower)
-    public static final int TICK = 100;
+    public static final int TICK = 0;
 
     public static void main(String[] args) {
         Main main = new Main();
         Boolean doSteps = false;
-        int maxSteps = 0;
+        int maxSteps = 1;
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to our model for Rebellion.");
@@ -61,113 +62,62 @@ public class Main {
         // worldMap.displayMap();
 
         // file output initial
-        File file = new File("output.txt");
-        try {
 
+        List<List<Integer>> stats = new ArrayList<>(); 
+        for(int i=0; i<4; i++){
+            List<Integer> column = new ArrayList<>(); 
+            stats.add(column);
+        }
+
+        int step = 1;
+        while (step <= maxSteps) {
+            main.step(worldMap.getMap());
+            int rebelCount = WorldMap.getRebellingAgents().size();
+            int quietCount = WorldMap.getActiveAgents().size() - rebelCount;
+            int jailedCount = WorldMap.getJailedAgents().size();
+            stats.get(0).add(step);
+            stats.get(1).add(quietCount);
+            stats.get(2).add(jailedCount);
+            stats.get(3).add(rebelCount);
+            
+            
+
+            System.out.println();
+            System.out.println("Step " + step + ":");
+            System.out.println("quiet agents: " + quietCount);
+            System.out.println("rebeling agents: " + rebelCount);
+            System.out.println("jailed agents: " + jailedCount);
+
+            worldMap.displayMap();
+
+            try {
+                Thread.sleep(TICK);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (doSteps){
+                step += 1;
+            }
+        }
+        
+        File file = new File("output.csv");
+
+        try {
             FileWriter writer = new FileWriter(file, true);
-            writer.write("Government Legitimacy: " + GOVERNMET_LEGITIMACY + "\n");
-            writer.write("Initial Agent Density: " + INITIAL_AGENT_DENSITY + "\n");
-            writer.write("Initial Police Density: " + INITIAL_POLICE_DENSITY + "\n");
-            writer.write("Max Jail Term: " + MAX_JAIL_TERM + "\n");
-            writer.write("\n");
-            writer.write("Step " + 0 + ":\n");
-            writer.write("quiet agents: " + WorldMap.getQuietCount() + "\n");
-            writer.write("active agents: " + WorldMap.getRebelCount() + "\n");
-            writer.write("jailed agents: " + WorldMap.getJailedAgents().size() + "\n");
-            writer.write("police: " + WorldMap.getPolice().size() + "\n");
-            writer.write("\n");
+            writer.write("step,quiet agents,jailed agents,active agents\n");
+            for(int i=0; i<maxSteps; i++){
+                for(int j=0; j<4; j++){
+                    writer.write(String.valueOf(stats.get(j).get(i)));
+                    if (j<3){ 
+                        writer.write(",");
+                    }
+                }
+                writer.write("\n");
+            }
             writer.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        // main loop
-        if (doSteps) {
-            int steps = 1;
-            int turns = 0;
-            while (turns < maxSteps) {
-
-                // do nest step
-                main.step(worldMap.getMap());
-                System.out.println();
-                System.out.println("Step " + steps + ":");
-
-                // display map
-                System.out.println("quiet agents: " + WorldMap.getQuietCount());
-                System.out.println("active agents: " + WorldMap.getRebelCount());
-                System.out.println("jailed agents: " + WorldMap.getJailedAgents().size());
-                System.out.println("police: " + WorldMap.getPolice().size());
-
-                // file output
-                try {
-
-                    FileWriter writer = new FileWriter(file, true);
-                    writer.write("Step " + steps + ":\n");
-                    writer.write("quiet agents: " + WorldMap.getQuietCount() + "\n");
-                    writer.write("active agents: " + WorldMap.getRebelCount() + "\n");
-                    writer.write("jailed agents: " + WorldMap.getJailedAgents().size() + "\n");
-                    writer.write("police: " + WorldMap.getPolice().size() + "\n");
-                    writer.write("\n");
-                    writer.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                worldMap.displayMap();
-
-                // sleep for a while
-                try {
-                    Thread.sleep(TICK);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                steps++;
-                turns++;
-            }
-        } else {
-            int steps = 1;
-            while (true) {
-
-                // do nest step
-                main.step(worldMap.getMap());
-                System.out.println();
-                System.out.println("Step " + steps + ":");
-
-                // display map
-                System.out.println("quiet agents: " + WorldMap.getQuietCount());
-                System.out.println("active agents: " + WorldMap.getRebelCount());
-                System.out.println("jailed agents: " + WorldMap.getJailedAgents().size());
-                System.out.println("police: " + WorldMap.getPolice().size());
-
-                // file output
-                try {
-
-                    FileWriter writer = new FileWriter(file, true);
-                    writer.write("Step " + steps + ":\n");
-                    writer.write("quiet agents: " + WorldMap.getQuietCount() + "\n");
-                    writer.write("active agents: " + WorldMap.getRebelCount() + "\n");
-                    writer.write("jailed agents: " + WorldMap.getJailedAgents().size() + "\n");
-                    writer.write("police: " + WorldMap.getPolice().size() + "\n");
-                    writer.write("\n");
-                    writer.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                worldMap.displayMap();
-
-                // sleep for a while
-                try {
-                    Thread.sleep(TICK);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                steps++;
-            }
-        }
-
     }
 
     /**

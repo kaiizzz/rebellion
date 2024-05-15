@@ -8,8 +8,9 @@ public class WorldMap {
     private double initialAgentDensity;
 
     private int numberOfAgents;
-    private static ArrayList<Entity> activeAgents = new ArrayList<>();
+    private static ArrayList<Entity> quietAgents = new ArrayList<>();
     private static ArrayList<Agent> jailedAgents = new ArrayList<>();
+    private static ArrayList<Agent> rebellingAgents = new ArrayList<>();
 
     private int numberOfCops;
     private static ArrayList<Entity> cops = new ArrayList<>();
@@ -43,11 +44,11 @@ public class WorldMap {
         numberOfAgents = (int) Math.ceil(initialAgentDensity * 0.01 * mapSize * mapSize);
         System.out.println("Number of agents: " + numberOfAgents);
         for (int i = 0; i < numberOfAgents; i++) {
-            activeAgents.add(new Agent());
+            quietAgents.add(new Agent());
 
         }
         placeEntities(cops, mapSize, initialCopDensity);
-        placeEntities(activeAgents, mapSize, initialAgentDensity);
+        placeEntities(quietAgents, mapSize, initialAgentDensity);
     }
 
     private void placeEntities(ArrayList<Entity> entities, int mapSize, double density) {
@@ -130,11 +131,11 @@ public class WorldMap {
 
     public static void addJailedAgent(Agent agent) {
         jailedAgents.add(agent);
-        activeAgents.remove(agent);
+        quietAgents.remove(agent);
     }
 
     public static List<Entity> getActiveAgents() {
-        return activeAgents;
+        return quietAgents;
     }
 
     public static List<Entity> getPolice() {
@@ -145,24 +146,10 @@ public class WorldMap {
         return jailedAgents;
     }
 
-    public static int getRebelCount() {
-        int count = 0;
-        for (Entity entity : activeAgents) {
-            if (entity.getSymbol() == Agent.REBEL) {
-                count += 1;
-            }
-        }
-        return count;
+    public static ArrayList<Agent> getRebellingAgents() {
+        return rebellingAgents;
     }
 
-    public static int getQuietCount() {
-        int count = 0;
-        for (Entity entity : activeAgents) {
-            if (entity.getSymbol() == Agent.AGENT) {
-                count += 1;
-            }
-        }
-        return count;
-    }
+
 
 }
