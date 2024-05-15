@@ -71,7 +71,8 @@ public class Main {
             writer.write("Max Jail Term: " + MAX_JAIL_TERM + "\n");
             writer.write("\n");
             writer.write("Step " + 0 + ":\n");
-            writer.write("active agents: " + WorldMap.getActiveAgents().size() + "\n");
+            writer.write("quiet agents: " + WorldMap.getQuietCount() + "\n");
+            writer.write("active agents: " + WorldMap.getRebelCount() + "\n");
             writer.write("jailed agents: " + WorldMap.getJailedAgents().size() + "\n");
             writer.write("police: " + WorldMap.getPolice().size() + "\n");
             writer.write("\n");
@@ -92,7 +93,8 @@ public class Main {
                 System.out.println("Step " + steps + ":");
 
                 // display map
-                System.out.println("active agents: " + WorldMap.getActiveAgents().size());
+                System.out.println("quiet agents: " + WorldMap.getQuietCount());
+                System.out.println("active agents: " + WorldMap.getRebelCount());
                 System.out.println("jailed agents: " + WorldMap.getJailedAgents().size());
                 System.out.println("police: " + WorldMap.getPolice().size());
 
@@ -101,7 +103,8 @@ public class Main {
 
                     FileWriter writer = new FileWriter(file, true);
                     writer.write("Step " + steps + ":\n");
-                    writer.write("active agents: " + WorldMap.getActiveAgents().size() + "\n");
+                    writer.write("quiet agents: " + WorldMap.getQuietCount() + "\n");
+                    writer.write("active agents: " + WorldMap.getRebelCount() + "\n");
                     writer.write("jailed agents: " + WorldMap.getJailedAgents().size() + "\n");
                     writer.write("police: " + WorldMap.getPolice().size() + "\n");
                     writer.write("\n");
@@ -132,7 +135,8 @@ public class Main {
                 System.out.println("Step " + steps + ":");
 
                 // display map
-                System.out.println("active agents: " + WorldMap.getActiveAgents().size());
+                System.out.println("quiet agents: " + WorldMap.getQuietCount());
+                System.out.println("active agents: " + WorldMap.getRebelCount());
                 System.out.println("jailed agents: " + WorldMap.getJailedAgents().size());
                 System.out.println("police: " + WorldMap.getPolice().size());
 
@@ -141,7 +145,8 @@ public class Main {
 
                     FileWriter writer = new FileWriter(file, true);
                     writer.write("Step " + steps + ":\n");
-                    writer.write("active agents: " + WorldMap.getActiveAgents().size() + "\n");
+                    writer.write("quiet agents: " + WorldMap.getQuietCount() + "\n");
+                    writer.write("active agents: " + WorldMap.getRebelCount() + "\n");
                     writer.write("jailed agents: " + WorldMap.getJailedAgents().size() + "\n");
                     writer.write("police: " + WorldMap.getPolice().size() + "\n");
                     writer.write("\n");
