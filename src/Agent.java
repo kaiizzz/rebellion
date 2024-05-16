@@ -4,6 +4,7 @@
  * Student Number: 115777
  * Date: 05/03/2024
  * Description: Agent class that extends Entity class
+ * Edited and improved by Lucas Kenna
  */
 
 public class Agent extends Entity {

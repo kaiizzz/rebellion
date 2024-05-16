@@ -1,3 +1,5 @@
+git rm --cached
+
 # Compiled class file
 *.class
 
@@ -25,4 +27,6 @@ replay_pid*
 
 
 *.txt
+
 *.csv
+

@@ -38,10 +38,14 @@ public class Main {
         Boolean doSteps = false;
         int maxSteps = 1;
 
+        // scanner to scan for user input
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to our model for Rebellion.");
-        System.out.println("Do you want this to run for a specific number of steps? (y/n)");
-        String response = scanner.next();
+        String response = "";
+        while (!response.equals("y") && !response.equals("n")) {
+            System.out.println("Please enter 'y' or 'n'");
+            response = scanner.next();
+        }
         if (response.equals("y")) {
             System.out.println("Please enter the number of steps: ");
             maxSteps = scanner.nextInt();
@@ -54,24 +58,26 @@ public class Main {
         scanner.close();
 
         // insert and display initial map
-        // WorldMap worldMap = new WorldMap(INITIAL_POLICE_DENSITY,
-        // INITIAL_AGENT_DENSITY);
         WorldMap worldMap = new WorldMap(INITIAL_POLICE_DENSITY, INITIAL_AGENT_DENSITY);
         worldMap.setUpMap(MAP_SIZE);
         System.out.println("Initial map:");
-        // worldMap.displayMap();
+        worldMap.displayMap();
+        
+        // create output file
+        File file = new File("output.csv");
 
-        // file output initial
-
+        // create stats list
         List<List<Integer>> stats = new ArrayList<>(); 
         for(int i=0; i<4; i++){
             List<Integer> column = new ArrayList<>(); 
             stats.add(column);
         }
 
+        // main loop
         int step = 1;
         while (step <= maxSteps) {
-            main.step(worldMap.getMap());
+
+            // update stats
             int rebelCount = WorldMap.getRebellingAgents().size();
             int quietCount = WorldMap.getActiveAgents().size() - rebelCount;
             int jailedCount = WorldMap.getJailedAgents().size();
@@ -79,17 +85,21 @@ public class Main {
             stats.get(1).add(quietCount);
             stats.get(2).add(jailedCount);
             stats.get(3).add(rebelCount);
-            
-            
 
+            // run step
+            main.step(worldMap.getMap());
+            
+            // display stats for debugging
             System.out.println();
             System.out.println("Step " + step + ":");
             System.out.println("quiet agents: " + quietCount);
             System.out.println("rebeling agents: " + rebelCount);
             System.out.println("jailed agents: " + jailedCount);
 
+            // display map for debugging
             worldMap.displayMap();
 
+            // pause for TICK milliseconds for animation
             try {
                 Thread.sleep(TICK);
             } catch (InterruptedException e) {
@@ -100,11 +110,14 @@ public class Main {
             }
         }
         
-        File file = new File("output.csv");
-
+        // write stats to file
         try {
             FileWriter writer = new FileWriter(file, true);
+            
+            // write header
             writer.write("step,quiet agents,jailed agents,active agents\n");
+
+            // write stats
             for(int i=0; i<maxSteps; i++){
                 for(int j=0; j<4; j++){
                     writer.write(String.valueOf(stats.get(j).get(i)));
