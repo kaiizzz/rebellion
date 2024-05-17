@@ -106,12 +106,14 @@ public class Agent extends Entity {
         int count = 0;
         // checks each tile in vision, wrapping around x and y is map boundary is reached
         //System.out.println("position: (" + xpos + ", " + ypos + ")");
-        for (int i = xpos - Main.VISION; i<= xpos + Main.VISION; i++){
-            for (int j = ypos - Main.VISION; j <= ypos + Main.VISION; j++){
-                int nx = WorldMap.wrapCoordinates(i);
-                int ny = WorldMap.wrapCoordinates(j);
-                if (map[nx][ny].getActiveEntity() != null && map[nx][ny].getActiveEntity().getSymbol() == agentType) {
-                    count++;
+        for (int i = -Main.VISION; i<= Main.VISION; i++){
+            for (int j = -Main.VISION; j<= Main.VISION; j++){
+                if (i*i+j*j <= Main.VISION*Main.VISION){
+                    int nx = WorldMap.wrapCoordinates(xpos + i);
+                    int ny = WorldMap.wrapCoordinates(ypos + j);
+                    if (map[nx][ny].getActiveEntity() != null && map[nx][ny].getActiveEntity().getSymbol() == agentType) {
+                        count++;
+                    }
                 }
             }
         }  
@@ -130,7 +132,7 @@ public class Agent extends Entity {
     public void determineArrestProbability(Tile[][] map, int xpos, int ypos) {
         // look at all adgacent tiles to see police
         int policeCount = countAgentsInNeighbourhood(map, xpos, ypos, Police.POLICE);
-        int agentCount = 1 + (1 + countAgentsInNeighbourhood(map, xpos, ypos, Agent.REBEL));
+        int agentCount = (1 + countAgentsInNeighbourhood(map, xpos, ypos, Agent.REBEL));
         this.arrestProbability = (1 - Math.exp(-K * Math.floor(policeCount / agentCount)));
     }
 

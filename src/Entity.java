@@ -20,15 +20,17 @@ public class Entity {
     public void move(Tile[][] map, int x, int y) {
         ArrayList<Tile> emptyTiles = new ArrayList<>();
         // find all empty tiles within vision range
-        for (int i = x - Main.VISION; i<= x + Main.VISION; i++){
-            for (int j = y - Main.VISION; j <= y + Main.VISION; j++){
-                if(i == x && j == y){
-                    continue;
-                }
-                int wrappedX = WorldMap.wrapCoordinates(i);
-                int wrappedY = WorldMap.wrapCoordinates(j);
-                if (map[wrappedX][wrappedY].getActiveEntity() == null) {
-                    emptyTiles.add(map[wrappedX][wrappedY]);
+        for (int i = -Main.VISION; i<= Main.VISION; i++){
+            for (int j = -Main.VISION; j<= Main.VISION; j++){
+                if (i*i+j*j <= Main.VISION*Main.VISION){
+                    if(i == x && j == y){
+                        continue;
+                    }
+                    int wrappedX = WorldMap.wrapCoordinates(x + i);
+                    int wrappedY = WorldMap.wrapCoordinates(y + j);
+                    if (map[wrappedX][wrappedY].getActiveEntity() == null) {
+                        emptyTiles.add(map[wrappedX][wrappedY]);
+                    }
                 }
             }
         }

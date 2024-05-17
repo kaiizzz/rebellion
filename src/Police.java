@@ -12,16 +12,15 @@ public class Police extends Entity {
 
         // find tiles in vision range that contain rebels
         ArrayList<Tile> rebelTiles = new ArrayList<>();
-        for (int i = xpos - Main.VISION; i<= xpos + Main.VISION; i++){
-            for (int j = ypos - Main.VISION; j <= ypos + Main.VISION; j++){
-                if(i == xpos && j == ypos){
-                    continue;
-                }
-                int nx = WorldMap.wrapCoordinates(i);
-                int ny = WorldMap.wrapCoordinates(j);
-                Entity potentialEntity = map[nx][ny].getActiveEntity();
-                if (potentialEntity != null && potentialEntity.getSymbol() == Agent.REBEL) {
-                    rebelTiles.add(map[nx][ny]);
+        for (int i = -Main.VISION; i<= Main.VISION; i++){
+            for (int j = -Main.VISION; j<= Main.VISION; j++){
+                if (i*i+j*j <= Main.VISION*Main.VISION){
+                    int nx = WorldMap.wrapCoordinates(xpos + i);
+                    int ny = WorldMap.wrapCoordinates(ypos + j);
+                    Entity potentialEntity = map[nx][ny].getActiveEntity();
+                    if (potentialEntity != null && potentialEntity.getSymbol() == Agent.REBEL) {
+                        rebelTiles.add(map[nx][ny]);
+                    }
                 }
             }
         }  
