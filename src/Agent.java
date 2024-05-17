@@ -25,6 +25,7 @@ public class Agent extends Entity {
 
     // Initialize the variables for the agent
     private double percievedHardship;
+    private double baseGrievance;
     private double grievance;
     private double riskAversion;
     private double arrestProbability;
@@ -75,7 +76,20 @@ public class Agent extends Entity {
         //System.out.println((this.grievance - this.riskAversion * arrestProbability) ); // uncomment for
         // debugging
 
-        if ((this.grievance - (this.riskAversion * this.arrestProbability)) > REBEL_THRESHOLD) {
+        if (Main.extension){
+            int jailedCount = 0;
+            for (Tile tile : WorldMap.getTilesInNeighborhood(xpos, ypos, 'J')){
+                for (Entity entity : tile.getJailedEntities())
+                // in case of agents who have not been able to move out of jail due to lack of
+                    if(((Agent) entity).jailTerm > 0) {
+                        jailedCount += 1;
+                    }
+            };
+            //System.out.println(jailedCount);
+            grievance = percievedHardship * (1 - (Main.GOVERNMET_LEGITIMACY*(1+(Main.EXTENTSION_SCALING*jailedCount))));
+        }
+   
+        if ((grievance - (this.riskAversion * this.arrestProbability)) > REBEL_THRESHOLD) {
             if (state == AgentState.NORMAL){
                 WorldMap.getRebellingAgents().add(this);  
             }

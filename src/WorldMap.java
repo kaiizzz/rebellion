@@ -123,16 +123,22 @@ public class WorldMap {
                 if (i*i+j*j <= Main.VISION*Main.VISION){
                     int nx = WorldMap.wrapCoordinates(x + i);
                     int ny = WorldMap.wrapCoordinates(y + j);
-                    Entity potentialEntity = map[nx][ny].getActiveEntity();
-                    if(potentialEntity == null){
+                    Tile tile = map[nx][ny];
+                    if(tile.getActiveEntity() == null){
                         if(type == ' '){
-                        tiles.add(map[nx][ny]);
+                            tiles.add(map[nx][ny]);
+                            continue;
                         }
 
+                    } 
+                    else if (tile.getActiveEntity().getSymbol() == type) {
+                        tiles.add(tile);
+                        continue;
+                    } 
+                    if (type == 'J' && tile.jailOccupied()){
+                        tiles.add(tile);
                     }
-                    else if (potentialEntity.getSymbol() == type) {
-                        tiles.add(map[nx][ny]);
-                    }
+  
                 }
             }
         }  

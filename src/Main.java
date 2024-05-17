@@ -12,6 +12,7 @@ public class Main {
     public static final double GOVERNMET_LEGITIMACY = 0.82; // The government legitimacy value from 0-1
     public static final double INITIAL_AGENT_DENSITY = 70; // The initial density of agents in the map
     public static final double INITIAL_POLICE_DENSITY = 4; // The initial density of police in the map
+    public static final double EXTENTSION_SCALING = 0.003; // the proportion government legitimacy increases 
     // IMPORTANT: INITIAL_AGENT_DENSITY + INITIAL_POLICE_DENSITY should be less than
     // 100
     public static final int MAX_JAIL_TERM = 30; // The maximum jail term for agents
@@ -33,6 +34,7 @@ public class Main {
     // speed of simulation (higher number is slower)
     public static final int TICK = 0;
 
+    public static boolean extension = false;
     public static void main(String[] args) {
         Main main = new Main();
         Boolean doSteps = false;
@@ -42,19 +44,19 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to our model for Rebellion.");
         String response = "";
+        System.out.println("Would you like to run the model with the extension enabled?");
         while (!response.equals("y") && !response.equals("n")) {
             System.out.println("Please enter 'y' or 'n'");
             response = scanner.next();
         }
+
         if (response.equals("y")) {
-            System.out.println("Please enter the number of steps: ");
-            maxSteps = scanner.nextInt();
-            doSteps = true;
-            System.out.println("Running for " + maxSteps + " steps...");
-        } else {
-            System.out.println("Running... press ctrl+c to stop.");
-            doSteps = false;
+            extension = true;
         }
+        
+        System.out.println("Please enter the number of steps: ");
+        maxSteps = scanner.nextInt();
+        System.out.println("Running for " + maxSteps + " steps...");
         scanner.close();
 
         // insert and display initial map
@@ -105,9 +107,8 @@ public class Main {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            if (doSteps){
-                step += 1;
-            }
+            step += 1;
+            
         }
         
         // write stats to file
