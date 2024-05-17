@@ -11,19 +11,7 @@ public class Police extends Entity {
     public void attemptArrest(Tile map[][]) {
 
         // find tiles in vision range that contain rebels
-        ArrayList<Tile> rebelTiles = new ArrayList<>();
-        for (int i = -Main.VISION; i<= Main.VISION; i++){
-            for (int j = -Main.VISION; j<= Main.VISION; j++){
-                if (i*i+j*j <= Main.VISION*Main.VISION){
-                    int nx = WorldMap.wrapCoordinates(xpos + i);
-                    int ny = WorldMap.wrapCoordinates(ypos + j);
-                    Entity potentialEntity = map[nx][ny].getActiveEntity();
-                    if (potentialEntity != null && potentialEntity.getSymbol() == Agent.REBEL) {
-                        rebelTiles.add(map[nx][ny]);
-                    }
-                }
-            }
-        }  
+        ArrayList<Tile> rebelTiles = WorldMap.getTilesInNeighborhood(xpos, ypos, 'R');
         
         if (rebelTiles.size() == 0) {
             return;

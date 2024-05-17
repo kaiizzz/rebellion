@@ -18,23 +18,7 @@ public class Entity {
      * @param y
      */
     public void move(Tile[][] map, int x, int y) {
-        ArrayList<Tile> emptyTiles = new ArrayList<>();
-        // find all empty tiles within vision range
-        for (int i = -Main.VISION; i<= Main.VISION; i++){
-            for (int j = -Main.VISION; j<= Main.VISION; j++){
-                if (i*i+j*j <= Main.VISION*Main.VISION){
-                    if(i == x && j == y){
-                        continue;
-                    }
-                    int wrappedX = WorldMap.wrapCoordinates(x + i);
-                    int wrappedY = WorldMap.wrapCoordinates(y + j);
-                    if (map[wrappedX][wrappedY].getActiveEntity() == null) {
-                        emptyTiles.add(map[wrappedX][wrappedY]);
-                    }
-                }
-            }
-        }
-        
+        ArrayList<Tile> emptyTiles = WorldMap.getTilesInNeighborhood(x, y, ' ');
         if(emptyTiles.size() == 0){
             return;
         }

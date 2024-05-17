@@ -9,7 +9,7 @@ public class Main {
 
     // Change the value of the following constants to test the program
     public static final int VISION = 7; // The vision range of the agents and police
-    public static final double GOVERNMET_LEGITIMACY = 0.80; // The government legitimacy value from 0-1
+    public static final double GOVERNMET_LEGITIMACY = 0.82; // The government legitimacy value from 0-1
     public static final double INITIAL_AGENT_DENSITY = 70; // The initial density of agents in the map
     public static final double INITIAL_POLICE_DENSITY = 4; // The initial density of police in the map
     // IMPORTANT: INITIAL_AGENT_DENSITY + INITIAL_POLICE_DENSITY should be less than

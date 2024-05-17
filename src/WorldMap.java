@@ -15,7 +15,7 @@ public class WorldMap {
     private int numberOfCops;
     private static ArrayList<Entity> cops = new ArrayList<>();
 
-    private Tile[][] map;
+    private static Tile[][] map;
 
     public WorldMap(double d, double e) {
         this.initialCopDensity = d;
@@ -114,6 +114,32 @@ public class WorldMap {
             System.out.println();
         }
     }
+
+    // returns all tiles occupied by type in vision range of a coordinate
+    static ArrayList<Tile> getTilesInNeighborhood(int x, int y, char type){
+        ArrayList<Tile> tiles = new ArrayList<>();
+        for (int i = -Main.VISION; i<= Main.VISION; i++){
+            for (int j = -Main.VISION; j<= Main.VISION; j++){
+                if (i*i+j*j <= Main.VISION*Main.VISION){
+                    int nx = WorldMap.wrapCoordinates(x + i);
+                    int ny = WorldMap.wrapCoordinates(y + j);
+                    Entity potentialEntity = map[nx][ny].getActiveEntity();
+                    if(potentialEntity == null){
+                        if(type == ' '){
+                        tiles.add(map[nx][ny]);
+                        }
+
+                    }
+                    else if (potentialEntity.getSymbol() == type) {
+                        tiles.add(map[nx][ny]);
+                    }
+                }
+            }
+        }  
+        return tiles;
+    }
+
+
 
     public Tile[][] getMap() {
         return map;
