@@ -64,6 +64,10 @@ public class Main {
         }
 
         System.out.println("\nPlease enter the number of steps: ");
+        // get the number of steps only allow numbers
+        while (!scanner.hasNextInt()) {
+            scanner.next();
+        }
         maxSteps = scanner.nextInt();
 
         System.out.println("\nWould you like to display the map in the command line? (y/n)");
