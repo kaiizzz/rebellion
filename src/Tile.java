@@ -24,7 +24,7 @@ public class Tile {
     // jails the active entity of tile
     public void jailEntity() {
         ((Agent) activeEntity).update(AgentState.JAILED);
-        ((Agent) activeEntity).setJailTerm((int) (Math.random() * Main.MAX_JAIL_TERM));
+        ((Agent) activeEntity).setJailTerm((int) (Math.random() * Params.MAX_JAIL_TERM));
         WorldMap.addJailedAgent((Agent) activeEntity);
         WorldMap.getRebellingAgents().remove((Agent) activeEntity);
         WorldMap.getActiveAgents().remove((Agent) activeEntity);

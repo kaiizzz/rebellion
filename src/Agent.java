@@ -21,7 +21,7 @@ public class Agent extends Entity {
     public static final double REBEL_THRESHOLD = 0.1;
 
     // Initialize the state of the agent
-    private AgentState state = AgentState.NORMAL;
+    public AgentState state = AgentState.NORMAL;
 
     // Initialize the variables for the agent
     private double percievedHardship;
@@ -40,7 +40,7 @@ public class Agent extends Entity {
         this.riskAversion = Math.random();
 
         // greivance calculation
-        this.grievance = this.percievedHardship * (1 - Main.GOVERNMET_LEGITIMACY);
+        this.grievance = this.percievedHardship * (1 - Params.GOVERNMET_LEGITIMACY);
 
         // this.arrestProbability = 1;
 
@@ -79,7 +79,7 @@ public class Agent extends Entity {
      * @param y
      * @return
      */
-    public void checkRebellion(Tile[][] map, int x, int y) {
+    public void checkRebellion(Tile[][] map) {
         // System.out.println((this.grievance - this.riskAversion * arrestProbability)
         // ); // uncomment for
         // debugging
@@ -88,7 +88,7 @@ public class Agent extends Entity {
             int jailedCount = 0;
 
             // loop through all jailed agents in the neighborhood
-            for (Tile tile : WorldMap.getTilesInNeighborhood(xpos, ypos, 'J')) {
+            for (Tile tile : WorldMap.getTilesInNeighborhood(this.xpos, this.ypos, 'J')) {
                 for (Entity entity : tile.getJailedEntities())
                     // in case of agents who have not been able to move out of jail due to lack of
                     if (((Agent) entity).jailTerm > 0) {
@@ -98,7 +98,7 @@ public class Agent extends Entity {
 
             // calculate the base grievance
             grievance = percievedHardship
-                    * (1 - (Main.GOVERNMET_LEGITIMACY * (1 + (Main.EXTENTSION_SCALING * jailedCount))));
+                    * (1 - (Params.GOVERNMET_LEGITIMACY * (1 + (Params.EXTENTSION_SCALING * jailedCount))));
         }
 
         // check if the agent will rebel
@@ -126,10 +126,13 @@ public class Agent extends Entity {
      * @param ypos
      * @return probability
      */
-    public void determineArrestProbability(Tile[][] map, int xpos, int ypos) {
+    public void determineArrestProbability(Tile[][] map) {
         // look at all adgacent tiles to see police
-        int policeCount = WorldMap.getTilesInNeighborhood(xpos, ypos, 'P').size();
-        int agentCount = (1 + WorldMap.getTilesInNeighborhood(xpos, ypos, 'R').size());
+        int policeCount = WorldMap.getTilesInNeighborhood(this.xpos, this.ypos, 'P').size();
+        int agentCount = (1 + WorldMap.getTilesInNeighborhood(this.xpos, this.ypos, 'R').size());
+        if (state == AgentState.REBEL){
+            agentCount -= 1;
+        }
         this.arrestProbability = (1 - Math.exp(-K * Math.floor(policeCount / agentCount)));
     }
 

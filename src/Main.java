@@ -15,17 +15,6 @@ import java.util.Scanner;
 
 public class Main {
 
-    // Change the value of the following constants to test the program
-    public static final int VISION = 7; // The vision range of the agents and police
-    public static final double GOVERNMET_LEGITIMACY = 0.82; // The government legitimacy value from 0-1
-    public static final double INITIAL_AGENT_DENSITY = 70; // The initial density of agents in the map
-    public static final double INITIAL_POLICE_DENSITY = 4; // The initial density of police in the map
-    public static final double EXTENTSION_SCALING = 0.003; // the proportion government legitimacy increases
-    // IMPORTANT: INITIAL_AGENT_DENSITY + INITIAL_POLICE_DENSITY should be less than
-    // 100
-
-    public static final int MAX_JAIL_TERM = 30; // The maximum jail term for agents
-
     // color constants
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
@@ -37,13 +26,7 @@ public class Main {
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
 
-    // map size
-    public static final int MAP_SIZE = 40;
-
-    // speed of simulation (higher number is slower)
-    public static final int TICK = 0;
-
-    public static boolean extension = false;
+    public static boolean extension = false; 
 
     public static void main(String[] args) {
         Main main = new Main();
@@ -81,14 +64,13 @@ public class Main {
             displayMap = true;
         }
         System.out.println("\nPlease wait, running for " + maxSteps + " steps...\n");
-        System.out.print("Progress: ");
         scanner.close();
 
-        // insert and display initial map
-        WorldMap worldMap = new WorldMap(INITIAL_POLICE_DENSITY, INITIAL_AGENT_DENSITY);
-        worldMap.setUpMap(MAP_SIZE);
+        // create inital map
+        WorldMap worldMap = new WorldMap();
+        worldMap.setUpMap();
 
-        // diplay the map if the user wants to
+        // display the map if the user wants to
         if (displayMap) {
             System.out.println("Initial map:");
             worldMap.displayMap();
@@ -135,19 +117,13 @@ public class Main {
             // pause for TICK milliseconds for animation
             if (displayMap) {
                 try {
-                    Thread.sleep(TICK);
+                    Thread.sleep(Params.TICK);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
             step += 1;
 
-            // every 1 percent of the way, print a #
-            if (!displayMap) {
-                if (step % (maxSteps / 35) == 0) {
-                    System.out.print("#");
-                }
-            }
         }
 
         System.out.println("\n\nSimulation complete.\nStats written to output.csv.\n");
@@ -177,42 +153,33 @@ public class Main {
 
     /**
      * Move agents and police
+     * NOTE - lists of entities are shuffled randomly before move, agent and cop rule
+     * this is to emulate how NetLogo patches return in a random order each time
      * 
      * @param map
      */
     public void step(Tile[][] map) {
 
-        // free all agents who have served their jail sentences
-        ArrayList<Agent> toRemove = new ArrayList<>();
-        for (Agent agent : WorldMap.getJailedAgents()) {
-            if (agent.attemptFree()) {
-                toRemove.add(agent);
-                WorldMap.getActiveAgents().add(agent);
-            }
-        }
-        WorldMap.getJailedAgents().removeAll(toRemove);
-
         // move rule
+        Collections.shuffle(WorldMap.getActiveAgents());
         for (Entity entity : WorldMap.getActiveAgents()) {
-            entity.move(map, entity.getXpos(), entity.getYpos());
+            entity.move(map);
         }
+        Collections.shuffle(WorldMap.getPolice());
         for (Entity entity : WorldMap.getPolice()) {
-            entity.move(map, entity.getXpos(), entity.getYpos());
+            entity.move(map);
         }
 
         // agent rule
-        int count = 0;
         Collections.shuffle(WorldMap.getActiveAgents());
         for (Entity entity : WorldMap.getActiveAgents()) {
             Agent agent = (Agent) entity;
-            agent.determineArrestProbability(map, agent.getXpos(), agent.getYpos());
-            agent.checkRebellion(map, agent.getXpos(), agent.getYpos());
-            if (agent.getSymbol() == Agent.REBEL) {
-                count += 1;
-            }
+            agent.determineArrestProbability(map);
+            agent.checkRebellion(map);
         }
 
         // cop rule
+        Collections.shuffle(WorldMap.getPolice());
         for (Entity entity : WorldMap.getPolice()) {
             Police police = (Police) entity;
             police.attemptArrest(map);
@@ -223,6 +190,15 @@ public class Main {
             Agent agent = (Agent) entity;
             agent.decrementJailTerm();
         }
-
+        
+        // free all agents who have served their jail sentences
+        ArrayList<Agent> toRemove = new ArrayList<>();
+        for (Agent agent : WorldMap.getJailedAgents()) {
+            if (agent.attemptFree()) {
+                toRemove.add(agent);
+                WorldMap.getActiveAgents().add(agent);
+            }
+        }
+        WorldMap.getJailedAgents().removeAll(toRemove);
     }
 }

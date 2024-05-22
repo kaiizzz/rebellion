@@ -25,8 +25,8 @@ public class Entity {
      * @param x
      * @param y
      */
-    public void move(Tile[][] map, int x, int y) {
-        ArrayList<Tile> emptyTiles = WorldMap.getTilesInNeighborhood(x, y, ' ');
+    public void move(Tile[][] map) {
+        ArrayList<Tile> emptyTiles = WorldMap.getTilesInNeighborhood(this.xpos, this.ypos, ' ');
         if (emptyTiles.size() == 0) {
             return;
         }
@@ -34,19 +34,20 @@ public class Entity {
         // randomly select one empty tile and move to it
         int random = (int) (Math.random() * emptyTiles.size());
         Tile newTile = emptyTiles.get(random);
-        newTile.setActiveEntity(this);
-        setCoords(newTile.getX(), newTile.getY());
-
         // if moving entity is in jail, remove from old tile's jail
-        if (map[x][y].getJailedEntities().contains(this)) {
-            map[x][y].freeJailedAgent(this);
+        if (map[this.xpos][this.ypos].getJailedEntities().contains(this)) {
+            map[this.xpos][this.ypos].freeJailedAgent(this);
+            setCoords(newTile.getX(), newTile.getY());
+            newTile.setActiveEntity(this);
             return;
         }
-
         // if moving entity was active, instead remove it from old tile
-        map[x][y].setActiveEntity(null);
-        if (this instanceof Police) {
-        }
+        map[this.xpos][this.ypos].setActiveEntity(null);
+        setCoords(newTile.getX(), newTile.getY());
+        newTile.setActiveEntity(this);
+        
+        
+
 
     }
 
@@ -60,11 +61,11 @@ public class Entity {
     }
 
     public int getXpos() {
-        return xpos;
+        return this.xpos;
     }
 
     public int getYpos() {
-        return ypos;
+        return this.ypos;
     }
 
     public void setCoords(int x, int y) {

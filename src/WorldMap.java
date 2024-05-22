@@ -10,35 +10,31 @@ import java.util.List;
  * Description: WorldMap class that represents the map in the simulation
  */
 
-// Todo: make this class a proper singleton
 public class WorldMap {
-    private double initialCopDensity;
-    private double initialAgentDensity;
 
-    private int numberOfAgents;
     private static ArrayList<Entity> quietAgents = new ArrayList<>();
     private static ArrayList<Agent> jailedAgents = new ArrayList<>();
     private static ArrayList<Agent> rebellingAgents = new ArrayList<>();
 
-    private int numberOfCops;
     private static ArrayList<Entity> cops = new ArrayList<>();
 
     private static Tile[][] map;
 
-    public WorldMap(double d, double e) {
-        this.initialCopDensity = d;
-        this.initialAgentDensity = e;
+
+
+    @SuppressWarnings("unused")
+    public WorldMap() {
 
         // check if density exceeds 100%
-        if (this.initialCopDensity + this.initialAgentDensity > 100) {
+        if (Params.INITIAL_POLICE_DENSITY + Params.INITIAL_AGENT_DENSITY > 100) {
             System.out.println("Density exceeds 100%");
             System.exit(0);
         }
 
         // create map
-        WorldMap.map = new Tile[Main.MAP_SIZE][Main.MAP_SIZE];
-        for (int i = 0; i < Main.MAP_SIZE; i++) {
-            for (int j = 0; j < Main.MAP_SIZE; j++) {
+        WorldMap.map = new Tile[Params.MAP_SIZE][Params.MAP_SIZE];
+        for (int i = 0; i < Params.MAP_SIZE; i++) {
+            for (int j = 0; j < Params.MAP_SIZE; j++) {
                 map[i][j] = new Tile(i, j);
             }
         }
@@ -47,33 +43,38 @@ public class WorldMap {
     /**
      * Set up the map with the initial density of cops and agents
      * 
-     * @param mapSize
      */
-    public void setUpMap(int mapSize) {
+    public void setUpMap() {
         // create cops
-        numberOfCops = (int) Math.ceil(initialCopDensity * 0.01 * mapSize * mapSize);
+        int numberOfCops = (int) (Params.INITIAL_POLICE_DENSITY * 0.01 * Params.MAP_SIZE * Params.MAP_SIZE);
         // System.out.println("Number of cops: " + numberOfCops); // for debugging
         for (int i = 0; i < numberOfCops; i++) {
             cops.add(new Police());
         }
 
         // Create agents
-        numberOfAgents = (int) Math.ceil(initialAgentDensity * 0.01 * mapSize * mapSize);
+        int numberOfAgents = (int) (Params.INITIAL_AGENT_DENSITY * 0.01 * Params.MAP_SIZE * Params.MAP_SIZE);
         // System.out.println("Number of agents: " + numberOfAgents); // for debugging
         for (int i = 0; i < numberOfAgents; i++) {
             quietAgents.add(new Agent());
 
         }
-        placeEntities(cops, mapSize, initialCopDensity);
-        placeEntities(quietAgents, mapSize, initialAgentDensity);
+        placeEntities(cops, Params.INITIAL_POLICE_DENSITY);
+        placeEntities(quietAgents, Params.INITIAL_AGENT_DENSITY);
     }
 
-    private void placeEntities(ArrayList<Entity> entities, int mapSize, double density) {
+    /**
+     * randomly distribute a list of entities across the map
+     * 
+     * @param entities
+     * @param density
+     */
+    private void placeEntities(ArrayList<Entity> entities, double density) {
         // gets coordinates of all empty tiles in entire map (can probably create one
         // function to do this for both Entity.move and WorldMap)
         ArrayList<List<Integer>> emptyTiles = new ArrayList<List<Integer>>();
-        for (int i = 0; i < mapSize; i++) {
-            for (int j = 0; j < mapSize; j++) {
+        for (int i = 0; i < Params.MAP_SIZE; i++) {
+            for (int j = 0; j < Params.MAP_SIZE; j++) {
                 if (map[i][j].getActiveEntity() == null) {
                     emptyTiles.add(Arrays.asList(i, j));
                 }
@@ -84,7 +85,7 @@ public class WorldMap {
         List<Entity> remEntities = new ArrayList<>(entities);
         try {
             Entity entity;
-            // places entities randomly in unoccupied
+            // places entities randomly into unoccupied tiles
             while (!remEntities.isEmpty()) {
                 entity = remEntities.get(0);
                 int random = (int) (Math.random() * emptyTiles.size());
@@ -106,13 +107,13 @@ public class WorldMap {
      */
     public void displayMap() {
         // display map
-        for (int i = 0; i < Main.MAP_SIZE; i++) {
-            for (int j = 0; j < Main.MAP_SIZE; j++) {
+        for (int i = 0; i < Params.MAP_SIZE; i++) {
+            for (int j = 0; j < Params.MAP_SIZE; j++) {
                 Tile tile = map[i][j];
                 if (!(tile.getActiveEntity() == null)) {
                     char symbol = tile.getActiveEntity().getSymbol();
                     String color = Main.ANSI_GREEN;
-                    // highlight cells that have police blue and rebels red and jailed agents purple
+                    // colors police blue, rebels red and jailed agents purple
                     if (symbol == Agent.JAILED) {
                         color = Main.ANSI_PURPLE;
                     } else if (symbol == Police.POLICE) {
@@ -120,7 +121,7 @@ public class WorldMap {
                     } else if (symbol == Agent.REBEL) {
                         color = Main.ANSI_RED;
                     }
-                    // highlight cells that have jailed agents purple
+                    // highlight the borders of tiles that are occupied and also have jailed agents purple
                     if (tile.jailOccupied()) {
                         System.out.print(
                                 Main.ANSI_PURPLE + "[" + color + symbol + Main.ANSI_PURPLE + "]" + Main.ANSI_RESET);
@@ -150,9 +151,9 @@ public class WorldMap {
      */
     static ArrayList<Tile> getTilesInNeighborhood(int x, int y, char type) {
         ArrayList<Tile> tiles = new ArrayList<>();
-        for (int i = -Main.VISION; i <= Main.VISION; i++) {
-            for (int j = -Main.VISION; j <= Main.VISION; j++) {
-                if (i * i + j * j <= Main.VISION * Main.VISION) {
+        for (int i = (int) -Params.VISION -1; i <= (int) Params.VISION +1; i++) {
+            for (int j = (int)-Params.VISION -1; j <= (int) Params.VISION +1; j++) {
+                if ((i * i) + (j * j) <= Params.VISION * Params.VISION) {
                     int nx = WorldMap.wrapCoordinates(x + i);
                     int ny = WorldMap.wrapCoordinates(y + j);
                     Tile tile = map[nx][ny];
@@ -183,9 +184,9 @@ public class WorldMap {
     // helper function to wrap coordinates that go out of map bounds to other side
     // of map
     public static int wrapCoordinates(int pos) {
-        int result = pos % Main.MAP_SIZE;
+        int result = pos % Params.MAP_SIZE;
         if (result < 0) {
-            result += Main.MAP_SIZE;
+            result += Params.MAP_SIZE;
         }
         return result;
     }

@@ -19,7 +19,7 @@ public class Police extends Entity {
     public void attemptArrest(Tile map[][]) {
 
         // find tiles in vision range that contain rebels
-        ArrayList<Tile> rebelTiles = WorldMap.getTilesInNeighborhood(xpos, ypos, 'R');
+        ArrayList<Tile> rebelTiles = WorldMap.getTilesInNeighborhood(this.xpos, this.ypos, 'R');
 
         if (rebelTiles.size() == 0) {
             return;
@@ -32,7 +32,7 @@ public class Police extends Entity {
         // jail rebel, move onto tile
         chosenTile.jailEntity();
         chosenTile.setActiveEntity(this);
-        map[xpos][ypos].setActiveEntity(null);
+        map[this.xpos][this.ypos].setActiveEntity(null);
         setCoords(chosenTile.getX(), chosenTile.getY());
 
     }
