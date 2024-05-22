@@ -1,12 +1,20 @@
 import java.util.ArrayList;
 
+/**
+ * Tile
+ * Author: Lucas Kenna
+ * Student Number: 1170784
+ * Date: 05/03/2024
+ * Description: Tile class that represents a tile in the simulation
+ */
+
 public class Tile {
     private Entity activeEntity;
     private ArrayList<Entity> jailedEntities;
     private int x;
     private int y;
 
-    public Tile(int x, int y){
+    public Tile(int x, int y) {
         this.x = x;
         this.y = y;
         this.activeEntity = null;
@@ -14,9 +22,9 @@ public class Tile {
     }
 
     // jails the active entity of tile
-    public void jailEntity(){
+    public void jailEntity() {
         ((Agent) activeEntity).update(AgentState.JAILED);
-        ((Agent) activeEntity).setJailTerm((int) (Math.random()*Main.MAX_JAIL_TERM));
+        ((Agent) activeEntity).setJailTerm((int) (Math.random() * Main.MAX_JAIL_TERM));
         WorldMap.addJailedAgent((Agent) activeEntity);
         WorldMap.getRebellingAgents().remove((Agent) activeEntity);
         WorldMap.getActiveAgents().remove((Agent) activeEntity);
@@ -25,7 +33,7 @@ public class Tile {
 
     }
 
-
+    /* helper functions */
     public void setActiveEntity(Entity entity) {
         this.activeEntity = entity;
     }
@@ -50,7 +58,7 @@ public class Tile {
         return this.y;
     }
 
-    public ArrayList<Entity> getJailedEntities(){
+    public ArrayList<Entity> getJailedEntities() {
         return this.jailedEntities;
     }
 }

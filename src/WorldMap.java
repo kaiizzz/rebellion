@@ -2,6 +2,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * WorldMap
+ * Author: Lucas Kenna. Original By Bill Zhu
+ * Student Number: 1170784
+ * Date: 05/03/2024
+ * Description: WorldMap class that represents the map in the simulation
+ */
+
 // Todo: make this class a proper singleton
 public class WorldMap {
     private double initialCopDensity;
@@ -20,11 +28,15 @@ public class WorldMap {
     public WorldMap(double d, double e) {
         this.initialCopDensity = d;
         this.initialAgentDensity = e;
+
+        // check if density exceeds 100%
         if (this.initialCopDensity + this.initialAgentDensity > 100) {
             System.out.println("Density exceeds 100%");
             System.exit(0);
         }
-        this.map = new Tile[Main.MAP_SIZE][Main.MAP_SIZE];
+
+        // create map
+        WorldMap.map = new Tile[Main.MAP_SIZE][Main.MAP_SIZE];
         for (int i = 0; i < Main.MAP_SIZE; i++) {
             for (int j = 0; j < Main.MAP_SIZE; j++) {
                 map[i][j] = new Tile(i, j);
@@ -32,17 +44,22 @@ public class WorldMap {
         }
     }
 
+    /**
+     * Set up the map with the initial density of cops and agents
+     * 
+     * @param mapSize
+     */
     public void setUpMap(int mapSize) {
         // create cops
         numberOfCops = (int) Math.ceil(initialCopDensity * 0.01 * mapSize * mapSize);
-        System.out.println("Number of cops: " + numberOfCops);
+        // System.out.println("Number of cops: " + numberOfCops); // for debugging
         for (int i = 0; i < numberOfCops; i++) {
             cops.add(new Police());
         }
 
         // Create agents
         numberOfAgents = (int) Math.ceil(initialAgentDensity * 0.01 * mapSize * mapSize);
-        System.out.println("Number of agents: " + numberOfAgents);
+        // System.out.println("Number of agents: " + numberOfAgents); // for debugging
         for (int i = 0; i < numberOfAgents; i++) {
             quietAgents.add(new Agent());
 
@@ -62,6 +79,8 @@ public class WorldMap {
                 }
             }
         }
+
+        // copy entities to avoid concurrent modification
         List<Entity> remEntities = new ArrayList<>(entities);
         try {
             Entity entity;
@@ -81,6 +100,10 @@ public class WorldMap {
 
     }
 
+    /**
+     * Display the map
+     * 
+     */
     public void displayMap() {
         // display map
         for (int i = 0; i < Main.MAP_SIZE; i++) {
@@ -89,6 +112,7 @@ public class WorldMap {
                 if (!(tile.getActiveEntity() == null)) {
                     char symbol = tile.getActiveEntity().getSymbol();
                     String color = Main.ANSI_GREEN;
+                    // highlight cells that have police blue and rebels red and jailed agents purple
                     if (symbol == Agent.JAILED) {
                         color = Main.ANSI_PURPLE;
                     } else if (symbol == Police.POLICE) {
@@ -115,37 +139,42 @@ public class WorldMap {
         }
     }
 
-    // returns all tiles occupied by type in vision range of a coordinate
-    static ArrayList<Tile> getTilesInNeighborhood(int x, int y, char type){
+    /**
+     * Get the tiles in the neighborhood of a given tile that contain a certain type
+     * of entity or are empty or contain jailed agents
+     * 
+     * @param x
+     * @param y
+     * @param type
+     * @return
+     */
+    static ArrayList<Tile> getTilesInNeighborhood(int x, int y, char type) {
         ArrayList<Tile> tiles = new ArrayList<>();
-        for (int i = -Main.VISION; i<= Main.VISION; i++){
-            for (int j = -Main.VISION; j<= Main.VISION; j++){
-                if (i*i+j*j <= Main.VISION*Main.VISION){
+        for (int i = -Main.VISION; i <= Main.VISION; i++) {
+            for (int j = -Main.VISION; j <= Main.VISION; j++) {
+                if (i * i + j * j <= Main.VISION * Main.VISION) {
                     int nx = WorldMap.wrapCoordinates(x + i);
                     int ny = WorldMap.wrapCoordinates(y + j);
                     Tile tile = map[nx][ny];
-                    if(tile.getActiveEntity() == null){
-                        if(type == ' '){
+                    if (tile.getActiveEntity() == null) {
+                        if (type == ' ') {
                             tiles.add(map[nx][ny]);
                             continue;
                         }
 
-                    } 
-                    else if (tile.getActiveEntity().getSymbol() == type) {
+                    } else if (tile.getActiveEntity().getSymbol() == type) {
                         tiles.add(tile);
                         continue;
-                    } 
-                    if (type == 'J' && tile.jailOccupied()){
+                    }
+                    if (type == 'J' && tile.jailOccupied()) {
                         tiles.add(tile);
                     }
-  
+
                 }
             }
-        }  
+        }
         return tiles;
     }
-
-
 
     public Tile[][] getMap() {
         return map;
@@ -161,6 +190,7 @@ public class WorldMap {
         return result;
     }
 
+    /* helper functions */
     public static void addJailedAgent(Agent agent) {
         jailedAgents.add(agent);
         quietAgents.remove(agent);
@@ -181,7 +211,5 @@ public class WorldMap {
     public static ArrayList<Agent> getRebellingAgents() {
         return rebellingAgents;
     }
-
-
 
 }

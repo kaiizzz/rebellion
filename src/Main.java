@@ -5,6 +5,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Main
+ * Author: Bill Zhu, Lucas Kenna and Lin Xie
+ * Student Number: 115777, 1170784, 1231766
+ * Date: 05/03/2024
+ * Description: Main class that runs the simulation
+ */
+
 public class Main {
 
     // Change the value of the following constants to test the program
@@ -12,9 +20,10 @@ public class Main {
     public static final double GOVERNMET_LEGITIMACY = 0.82; // The government legitimacy value from 0-1
     public static final double INITIAL_AGENT_DENSITY = 70; // The initial density of agents in the map
     public static final double INITIAL_POLICE_DENSITY = 4; // The initial density of police in the map
-    public static final double EXTENTSION_SCALING = 0.003; // the proportion government legitimacy increases 
+    public static final double EXTENTSION_SCALING = 0.003; // the proportion government legitimacy increases
     // IMPORTANT: INITIAL_AGENT_DENSITY + INITIAL_POLICE_DENSITY should be less than
     // 100
+
     public static final int MAX_JAIL_TERM = 30; // The maximum jail term for agents
 
     // color constants
@@ -35,9 +44,9 @@ public class Main {
     public static final int TICK = 0;
 
     public static boolean extension = false;
+
     public static void main(String[] args) {
         Main main = new Main();
-        Boolean doSteps = false;
         int maxSteps = 1;
 
         // scanner to scan for user input
@@ -53,25 +62,41 @@ public class Main {
         if (response.equals("y")) {
             extension = true;
         }
-        
-        System.out.println("Please enter the number of steps: ");
+
+        System.out.println("\nPlease enter the number of steps: ");
         maxSteps = scanner.nextInt();
-        System.out.println("Running for " + maxSteps + " steps...");
+
+        System.out.println("\nWould you like to display the map in the command line? (y/n)");
+        response = "";
+        boolean displayMap = false;
+        while (!response.equals("y") && !response.equals("n")) {
+            System.out.println("Please enter 'y' or 'n'");
+            response = scanner.next();
+        }
+        if (response.equals("y")) {
+            displayMap = true;
+        }
+        System.out.println("\nPlease wait, running for " + maxSteps + " steps...\n");
+        System.out.print("Progress: ");
         scanner.close();
 
         // insert and display initial map
         WorldMap worldMap = new WorldMap(INITIAL_POLICE_DENSITY, INITIAL_AGENT_DENSITY);
         worldMap.setUpMap(MAP_SIZE);
-        System.out.println("Initial map:");
-        worldMap.displayMap();
-        
+
+        // diplay the map if the user wants to
+        if (displayMap) {
+            System.out.println("Initial map:");
+            worldMap.displayMap();
+        }
+
         // create output file
         File file = new File("output.csv");
 
         // create stats list
-        List<List<Integer>> stats = new ArrayList<>(); 
-        for(int i=0; i<4; i++){
-            List<Integer> column = new ArrayList<>(); 
+        List<List<Integer>> stats = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            List<Integer> column = new ArrayList<>();
             stats.add(column);
         }
 
@@ -90,39 +115,51 @@ public class Main {
 
             // run step
             main.step(worldMap.getMap());
-            
-            // display stats for debugging
-            System.out.println();
-            System.out.println("Step " + step + ":");
-            System.out.println("quiet agents: " + quietCount);
-            System.out.println("rebeling agents: " + rebelCount);
-            System.out.println("jailed agents: " + jailedCount);
 
-            // display map for debugging
-            worldMap.displayMap();
+            // display stats for debugging
+            if (displayMap) {
+                System.out.println();
+                System.out.println("Step " + step + ":");
+                System.out.println("quiet agents: " + quietCount);
+                System.out.println("rebeling agents: " + rebelCount);
+                System.out.println("jailed agents: " + jailedCount);
+
+                // display map
+                worldMap.displayMap();
+            }
 
             // pause for TICK milliseconds for animation
-            try {
-                Thread.sleep(TICK);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            if (displayMap) {
+                try {
+                    Thread.sleep(TICK);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
             step += 1;
-            
+
+            // every 1 percent of the way, print a #
+            if (!displayMap) {
+                if (step % (maxSteps / 35) == 0) {
+                    System.out.print("#");
+                }
+            }
         }
-        
+
+        System.out.println("\n\nSimulation complete.\nStats written to output.csv.\n");
+
         // write stats to file
         try {
             FileWriter writer = new FileWriter(file, true);
-            
+
             // write header
             writer.write("step,quiet agents,jailed agents,active agents\n");
 
             // write stats
-            for(int i=0; i<maxSteps; i++){
-                for(int j=0; j<4; j++){
+            for (int i = 0; i < maxSteps; i++) {
+                for (int j = 0; j < 4; j++) {
                     writer.write(String.valueOf(stats.get(j).get(i)));
-                    if (j<3){ 
+                    if (j < 3) {
                         writer.write(",");
                     }
                 }
@@ -170,7 +207,6 @@ public class Main {
                 count += 1;
             }
         }
-        System.out.println("rebelling agents: " + count);
 
         // cop rule
         for (Entity entity : WorldMap.getPolice()) {
