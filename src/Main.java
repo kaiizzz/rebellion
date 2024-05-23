@@ -107,7 +107,6 @@ public class Main {
                     // create inital map
             WorldMap worldMap = new WorldMap();
             worldMap.setUpMap();
-            worldMap.displayMap();
             
             // create stats list
 
