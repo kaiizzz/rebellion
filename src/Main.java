@@ -38,7 +38,7 @@ public class Main {
         System.out.println("Welcome to our model for Rebellion.");
         String response = "";
         System.out.println("Would you like to run the model" 
-            +"with the extension enabled?");
+            +" with the extension enabled?");
         while (!response.equals("y") && !response.equals("n")) {
             System.out.println("Please enter 'y' or 'n'");
             response = scanner.next();
