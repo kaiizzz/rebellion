@@ -12,11 +12,11 @@ import java.util.List;
 
 public class WorldMap {
 
-    private static ArrayList<Entity> quietAgents = new ArrayList<>();
-    private static ArrayList<Agent> jailedAgents = new ArrayList<>();
-    private static ArrayList<Agent> rebellingAgents = new ArrayList<>();
+    private static ArrayList<Entity> quietAgents; 
+    private static ArrayList<Agent> jailedAgents;
+    private static ArrayList<Agent> rebellingAgents;
 
-    private static ArrayList<Entity> cops = new ArrayList<>();
+    private static ArrayList<Entity> cops;
 
     private static Tile[][] map;
 
@@ -45,6 +45,11 @@ public class WorldMap {
      * 
      */
     public void setUpMap() {
+        quietAgents = new ArrayList<>();
+        jailedAgents = new ArrayList<>();
+        rebellingAgents = new ArrayList<>();
+        cops = new ArrayList<>();
+
         // create cops
         int numberOfCops = (int) (Params.INITIAL_POLICE_DENSITY * 0.01 * Params.MAP_SIZE * Params.MAP_SIZE);
         // System.out.println("Number of cops: " + numberOfCops); // for debugging

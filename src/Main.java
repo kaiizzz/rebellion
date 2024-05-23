@@ -31,6 +31,7 @@ public class Main {
     public static void main(String[] args) {
         Main main = new Main();
         int maxSteps = 1;
+        int runs = 1;
 
         // scanner to scan for user input
         Scanner scanner = new Scanner(System.in);
@@ -53,6 +54,13 @@ public class Main {
         }
         maxSteps = scanner.nextInt();
 
+        System.out.println("\nPlease enter the number of runs: ");
+        // get the number of runs only allow numbers
+        while (!scanner.hasNextInt()) {
+            scanner.next();
+        }
+        runs = scanner.nextInt();
+
         System.out.println("\nWould you like to display the map in the command line? (y/n)");
         response = "";
         boolean displayMap = false;
@@ -66,89 +74,101 @@ public class Main {
         System.out.println("\nPlease wait, running for " + maxSteps + " steps...\n");
         scanner.close();
 
-        // create inital map
-        WorldMap worldMap = new WorldMap();
-        worldMap.setUpMap();
-
-        // display the map if the user wants to
-        if (displayMap) {
-            System.out.println("Initial map:");
-            worldMap.displayMap();
-        }
-
         // create output file
         File file = new File("output.csv");
+        try {
+            FileWriter writer = new FileWriter(file, true);
 
-        // create stats list
-        List<List<Integer>> stats = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            List<Integer> column = new ArrayList<>();
-            stats.add(column);
+            // write header
+            writer.write("MODEL SETTINGS\n");
+            writer.write("Government Legitimacy, Vision, Max Jail Term, Agent Density, Cop Density\n");
+            writer.write(Params.GOVERNMET_LEGITIMACY+"," + Params.VISION +"," + Params.MAX_JAIL_TERM + ","
+            + Params.INITIAL_AGENT_DENSITY + "," + Params.INITIAL_POLICE_DENSITY + "\n");
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
+        // create stats list
+
+
         // main loop
-        int step = 1;
-        while (step <= maxSteps) {
+        for (int i=0; i<runs; i++){
+                    // create inital map
+            WorldMap worldMap = new WorldMap();
+            worldMap.setUpMap();
 
-            // update stats
-            int rebelCount = WorldMap.getRebellingAgents().size();
-            int quietCount = WorldMap.getActiveAgents().size() - rebelCount;
-            int jailedCount = WorldMap.getJailedAgents().size();
-            stats.get(0).add(step);
-            stats.get(1).add(quietCount);
-            stats.get(2).add(jailedCount);
-            stats.get(3).add(rebelCount);
-
-            // run step
-            main.step(worldMap.getMap());
-
-            // display stats for debugging
-            if (displayMap) {
-                System.out.println();
-                System.out.println("Step " + step + ":");
-                System.out.println("quiet agents: " + quietCount);
-                System.out.println("rebeling agents: " + rebelCount);
-                System.out.println("jailed agents: " + jailedCount);
-
-                // display map
-                worldMap.displayMap();
+            List<List<Integer>> stats = new ArrayList<>();
+            for (int x = 0; x < 4; x++) {
+                List<Integer> column = new ArrayList<>();
+                stats.add(column);
             }
+            int step = 0;
+            while (step <= maxSteps) {
 
-            // pause for TICK milliseconds for animation
-            if (displayMap) {
-                try {
-                    Thread.sleep(Params.TICK);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                // update stats
+                int rebelCount = WorldMap.getRebellingAgents().size();
+                int quietCount = WorldMap.getActiveAgents().size() - rebelCount;
+                int jailedCount = WorldMap.getJailedAgents().size();
+                stats.get(0).add(step);
+                stats.get(1).add(quietCount);
+                stats.get(2).add(jailedCount);
+                stats.get(3).add(rebelCount);
+
+                // run step
+                main.step(worldMap.getMap());
+                step += 1;
+
+                // display stats for debugging
+                if (displayMap) {
+                    System.out.println();
+                    System.out.println("Step " + step + ":");
+                    System.out.println("quiet agents: " + quietCount);
+                    System.out.println("rebeling agents: " + rebelCount);
+                    System.out.println("jailed agents: " + jailedCount);
+
+                    // display map
+                    worldMap.displayMap();
                 }
-            }
-            step += 1;
 
+                // pause for TICK milliseconds for animation
+                if (displayMap) {
+                    try {
+                        Thread.sleep(Params.TICK);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                
+            }
+
+            try {
+                FileWriter writer = new FileWriter(file, true);
+    
+                // write header
+                writer.write("\n Run " + (i + 1) + "\n");
+                writer.write("step,quiet agents,jailed agents,active agents\n");
+    
+                // write stats
+                for (int j = 0; j < maxSteps; j++) {
+                    for (int k = 0; k < 4; k++) {
+                        writer.write(String.valueOf(stats.get(k).get(j)));
+                        if (k < 3) {
+                            writer.write(",");
+                        }
+                    }
+                    writer.write("\n");
+                }
+                writer.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         System.out.println("\n\nSimulation complete.\nStats written to output.csv.\n");
 
         // write stats to file
-        try {
-            FileWriter writer = new FileWriter(file, true);
-
-            // write header
-            writer.write("step,quiet agents,jailed agents,active agents\n");
-
-            // write stats
-            for (int i = 0; i < maxSteps; i++) {
-                for (int j = 0; j < 4; j++) {
-                    writer.write(String.valueOf(stats.get(j).get(i)));
-                    if (j < 3) {
-                        writer.write(",");
-                    }
-                }
-                writer.write("\n");
-            }
-            writer.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        
     }
 
     /**
