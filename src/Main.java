@@ -182,7 +182,7 @@ public class Main {
         }
 
         System.out.println("\nSimulation complete.\nStats written" + 
-            "to output.csv.\n");
+            " to output.csv.\n");
 
         // write stats to file
         
