@@ -37,7 +37,8 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to our model for Rebellion.");
         String response = "";
-        System.out.println("Would you like to run the model with the extension enabled?");
+        System.out.println("Would you like to run the model" 
+            +"with the extension enabled?");
         while (!response.equals("y") && !response.equals("n")) {
             System.out.println("Please enter 'y' or 'n'");
             response = scanner.next();
@@ -49,15 +50,16 @@ public class Main {
 
         System.out.println("\nPlease enter the number of steps: ");
         // get the number of steps only allow numbers
-        while (!scanner.hasNextInt()) {
-            scanner.next();
+        while (!scanner.hasNextInt()){
+            System.out.println("Please enter an integer greater than 0");
+            scanner.nextInt();
         }
         maxSteps = scanner.nextInt();
 
         System.out.println("\nPlease enter the number of runs: ");
         // get the number of runs only allow numbers
         while (!scanner.hasNextInt()) {
-            scanner.next();
+            scanner.nextInt();
         }
         runs = scanner.nextInt();
 
@@ -71,7 +73,8 @@ public class Main {
         if (response.equals("y")) {
             displayMap = true;
         }
-        System.out.println("\nPlease wait, running for " + maxSteps + " steps...\n");
+        System.out.println("\nPlease wait, running for " 
+            + maxSteps + " steps...\n");
         scanner.close();
 
         // create output file
@@ -81,9 +84,11 @@ public class Main {
 
             // write header
             writer.write("MODEL SETTINGS\n");
-            writer.write("Government Legitimacy, Vision, Max Jail Term, Agent Density, Cop Density\n");
-            writer.write(Params.GOVERNMET_LEGITIMACY+"," + Params.VISION +"," + Params.MAX_JAIL_TERM + ","
-            + Params.INITIAL_AGENT_DENSITY + "," + Params.INITIAL_POLICE_DENSITY + "\n");
+            writer.write("Government Legitimacy, Vision, Max Jail Term," + 
+                "Agent Density, Cop Density\n");
+            writer.write(Params.GOVERNMET_LEGITIMACY+"," + Params.VISION +"," 
+            + Params.MAX_JAIL_TERM + "," + Params.INITIAL_AGENT_DENSITY + "," 
+            + Params.INITIAL_POLICE_DENSITY + "\n");
             writer.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -97,12 +102,16 @@ public class Main {
                     // create inital map
             WorldMap worldMap = new WorldMap();
             worldMap.setUpMap();
-
+            
+            // create stats list
             List<List<Integer>> stats = new ArrayList<>();
             for (int x = 0; x < 4; x++) {
                 List<Integer> column = new ArrayList<>();
                 stats.add(column);
             }
+
+            // run simulation
+            System.out.print("Run " + (i + 1) + " of " + runs + ": ");
             int step = 0;
             while (step <= maxSteps) {
 
@@ -138,16 +147,23 @@ public class Main {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                } else {
+                    if (step % ((maxSteps / 50)+1) == 0) {
+                        System.out.print("#");
+                    }
                 }
                 
             }
+            System.out.print(" ✔"); // prints completed step progress bar
+            System.out.println(); // print new line after progress bar
 
             try {
                 FileWriter writer = new FileWriter(file, true);
     
                 // write header
                 writer.write("\n Run " + (i + 1) + "\n");
-                writer.write("step,quiet agents,jailed agents,active agents\n");
+                writer.write("step,quiet agents,jailed" 
+                + "agents,active agents\n");
     
                 // write stats
                 for (int j = 0; j < maxSteps; j++) {
@@ -165,7 +181,8 @@ public class Main {
             }
         }
 
-        System.out.println("\n\nSimulation complete.\nStats written to output.csv.\n");
+        System.out.println("\nSimulation complete.\nStats written" + 
+            "to output.csv.\n");
 
         // write stats to file
         
