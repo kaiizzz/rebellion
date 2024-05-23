@@ -38,7 +38,7 @@ public class Main {
         System.out.println("Welcome to our model for Rebellion.");
         String response = "";
         System.out.println("Would you like to run the model" 
-            +"with the extension enabled?");
+            +" with the extension enabled?");
         while (!response.equals("y") && !response.equals("n")) {
             System.out.println("Please enter 'y' or 'n'");
             response = scanner.next();
@@ -74,7 +74,7 @@ public class Main {
             displayMap = true;
         }
         System.out.println("\nPlease wait, running for " 
-            + maxSteps + " steps...\n");
+            + maxSteps + " steps and " + runs + " runs...\n");
         scanner.close();
 
         // create output file
@@ -254,7 +254,7 @@ public class Main {
         }
             
         System.out.println("\nSimulation complete.\nStats written" + 
-            "to output.csv.\n");
+            " to output.csv.\n");
 
         // write stats to file
         
