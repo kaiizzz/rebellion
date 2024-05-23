@@ -98,17 +98,18 @@ public class Main {
 
 
         // main loop
+        List<List<Integer>> stats = new ArrayList<>();
+        for (int x = 0; x < 3*runs; x++) {
+            List<Integer> column = new ArrayList<>();
+            stats.add(column);
+        }
         for (int i=0; i<runs; i++){
                     // create inital map
             WorldMap worldMap = new WorldMap();
             worldMap.setUpMap();
             
             // create stats list
-            List<List<Integer>> stats = new ArrayList<>();
-            for (int x = 0; x < 4; x++) {
-                List<Integer> column = new ArrayList<>();
-                stats.add(column);
-            }
+
 
             // run simulation
             System.out.print("Run " + (i + 1) + " of " + runs + ": ");
@@ -119,10 +120,9 @@ public class Main {
                 int rebelCount = WorldMap.getRebellingAgents().size();
                 int quietCount = WorldMap.getActiveAgents().size() - rebelCount;
                 int jailedCount = WorldMap.getJailedAgents().size();
-                stats.get(0).add(step);
-                stats.get(1).add(quietCount);
-                stats.get(2).add(jailedCount);
-                stats.get(3).add(rebelCount);
+                stats.get(0+i*3).add(quietCount);
+                stats.get(1+i*3).add(jailedCount);
+                stats.get(2+i*3).add(rebelCount);
 
                 // run step
                 main.step(worldMap.getMap());
@@ -157,30 +157,102 @@ public class Main {
             System.out.print(" ✔"); // prints completed step progress bar
             System.out.println(); // print new line after progress bar
 
-            try {
-                FileWriter writer = new FileWriter(file, true);
-    
-                // write header
-                writer.write("\n Run " + (i + 1) + "\n");
-                writer.write("step,quiet agents,jailed" 
-                + "agents,active agents\n");
-    
-                // write stats
-                for (int j = 0; j < maxSteps; j++) {
-                    for (int k = 0; k < 4; k++) {
-                        writer.write(String.valueOf(stats.get(k).get(j)));
-                        if (k < 3) {
-                            writer.write(",");
-                        }
-                    }
-                    writer.write("\n");
-                }
-                writer.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
 
+        try {
+            FileWriter writer = new FileWriter(file, true);
+            ArrayList<ArrayList<Double>> averages = new ArrayList<>();
+            ArrayList<ArrayList<Double>> variances = new ArrayList<>();
+        
+            for(int i=0; i<3; i++){
+                averages.add(new ArrayList<Double>());
+                for(int j=0; j<runs; j++){
+                    int sum = 0;
+                    for (int k=0; k<maxSteps; k++){
+                        sum += stats.get(i + 3*j).get(k);
+                    }
+                    double average = (sum/(double)maxSteps);
+                    averages.get(i).add(average);
+                }
+            }
+
+            for(int i=0; i<3; i++){
+                variances.add(new ArrayList<Double>());
+                for(int j=0; j<runs; j++){
+                    double variance = 0;
+                    for (int k=0; k<maxSteps; k++){
+                        variance += Math.pow(stats.get(i + 3*j).get(k) - averages.get(i).get(j), 2);
+                    }
+                    variance /= (double) maxSteps;
+                    variances.get(i).add(variance);
+                }
+            }
+
+            // write header
+            for (int i=0; i<runs; i++){
+                writer.write("Run " + (i + 1) + ",,,,");
+            }
+            writer.write(",quiet mean of means, quiet variance,, jailed mean of means, jailed mean variance,, acitve mean of means, active mean variance");
+            writer.write("\nMean:,");
+            for (int i=0; i<runs; i++){
+                for(int j=0; j<3; j++){ 
+                    writer.write(averages.get(j).get(i) + ",");
+                }
+                writer.write(",");
+            }
+            writer.write("\nVariance:,");
+            for (int i=0; i<runs; i++){
+                for(int j=0; j<3; j++){ 
+                    writer.write(variances.get(j).get(i) + ",");
+                }
+                writer.write(",");
+            }
+
+            for(int i=0; i<3; i++){ 
+                double averageTotal = 0;
+                double varianceTotal = 0;
+                for(int j=0; j<runs; j++){
+                    averageTotal += averages.get(i).get(j);
+                    varianceTotal += variances.get(i).get(j);
+                }
+                double averageAverage = averageTotal/((double) runs);
+                double averageVariance = varianceTotal/((double) runs);
+                if(i==0){
+                    writer.write(averageAverage + ", ");
+                    writer.write(averageVariance + ",,");
+                }
+                if(i==1){
+                    writer.write(averageAverage + ", ");
+                    writer.write(averageVariance + ",,");
+                }  
+                if(i==2){
+                    writer.write(averageAverage + ",");
+                    writer.write(averageVariance + "\n");
+                }      
+                
+            }
+        
+
+            writer.write("\n");
+            for (int i=0; i<runs; i++){
+                writer.write("step,quiet agents,jailed" 
+                + "agents,active agents,");
+            }
+            writer.write("\n");
+            for (int i = 0; i < maxSteps; i++) {
+                for (int j=0; j<runs; j++){
+                    writer.write(i + ",");
+                    for (int k = 0; k < 3; k++) {
+                        writer.write(String.valueOf(stats.get(k + 3*j).get(i)) + ",");
+                    }
+                }
+                writer.write(",\n");
+            } 
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+            
         System.out.println("\nSimulation complete.\nStats written" + 
             "to output.csv.\n");
 
