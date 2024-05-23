@@ -74,7 +74,7 @@ public class Main {
             displayMap = true;
         }
         System.out.println("\nPlease wait, running for " 
-            + maxSteps + " steps...\n");
+            + maxSteps + " steps and " + runs + " runs...\n");
         scanner.close();
 
         // create output file

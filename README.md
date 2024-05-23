@@ -2,6 +2,7 @@
 model of netlogo model "rebellion" in java
 
 ## INSTRUCTIONS ON HOW TO RUN THE MODEL
+- Make sure you have a java IDE installed on your computer :D
 
 ### Parameters. 
 To change the parameters of the model, you can change the values of the following variables in the `Params.java` file:
@@ -16,9 +17,9 @@ To change the parameters of the model, you can change the values of the followin
 - TICK: the speed of simulation (higher number is slower), Set this parameter if you want to use the map GUI feature.
 
 ### Running the model
-To run the model, you can run the `Main.java` file. This will run the model with the default parameters. If you want to change the parameters, you can change the values in the `Params.java` file as detail above. 
+To run the model, you can navigate to the `Main.java` file and run the file.
 
-You will be prompted to enter if you want to run the normal or extended model. Enter `y` for the extended model and `n` for the normal model in the command line.
+You will be prompted in the console to enter if you want to run the normal or extended model. Enter `y` for the extended model and `n` for the normal model in the command line.
 
 You will then be prompted to enter the number of steps you want to run the model for. Enter the number of steps (integer above 0) you want to run the model for in the command line.
 
@@ -31,4 +32,11 @@ The model will then run for the number of steps you entered times by the number 
 ### Output
 The output of the model is a csv file called `output.csv` in the root directory of the project. The output contains the following columns:
 step,quiet agents,jailed agents,active agents
+
+The command line will prompt you when the simulation has completed and when the stats have been written to the csv file.
+
+
+.▀█▀.█▄█.█▀█.█▄.█.█▄▀　█▄█.█▀█.█─█
+─.█.─█▀█.█▀█.█.▀█.█▀▄　─█.─█▄█.█▄█
+
 
