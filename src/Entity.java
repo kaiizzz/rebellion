@@ -34,17 +34,10 @@ public class Entity {
         // randomly select one empty tile and move to it
         int random = (int) (Math.random() * emptyTiles.size());
         Tile newTile = emptyTiles.get(random);
-        // if moving entity is in jail, remove from old tile's jail
-        if (map[this.xpos][this.ypos].getJailedEntities().contains(this)) {
-            map[this.xpos][this.ypos].freeJailedAgent(this);
-            setCoords(newTile.getX(), newTile.getY());
-            newTile.setActiveEntity(this);
-            return;
-        }
-        // if moving entity was active, instead remove it from old tile
-        map[this.xpos][this.ypos].setActiveEntity(null);
+        map[this.xpos][this.ypos].removeEntity(this);
+        newTile.occupy(this);
         setCoords(newTile.getX(), newTile.getY());
-        newTile.setActiveEntity(this);
+        
         
         
 

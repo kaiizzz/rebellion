@@ -28,12 +28,11 @@ public class Police extends Entity {
         // select a random rebel tile
         int random = (int) (Math.random() * rebelTiles.size());
         Tile chosenTile = rebelTiles.get(random);
-
-        // jail rebel, move onto tile
-        chosenTile.jailEntity();
-        chosenTile.setActiveEntity(this);
-        map[this.xpos][this.ypos].setActiveEntity(null);
+        ((Agent) chosenTile.getActiveEntity()).update(AgentState.JAILED);
+        map[this.xpos][this.ypos].removeEntity(this);
+        chosenTile.occupy(this);
         setCoords(chosenTile.getX(), chosenTile.getY());
+        
 
     }
 

@@ -9,45 +9,41 @@ import java.util.ArrayList;
  */
 
 public class Tile {
-    private Entity activeEntity;
-    private ArrayList<Entity> jailedEntities;
+    private ArrayList<Entity> entities;
     private int x;
     private int y;
 
     public Tile(int x, int y) {
         this.x = x;
         this.y = y;
-        this.activeEntity = null;
-        this.jailedEntities = new ArrayList<>();
+        this.entities = new ArrayList<>();
     }
 
-    // jails the active entity of tile
-    public void jailEntity() {
-        ((Agent) activeEntity).update(AgentState.JAILED);
-        ((Agent) activeEntity).setJailTerm((int) (Math.random() * Params.MAX_JAIL_TERM));
-        WorldMap.addJailedAgent((Agent) activeEntity);
-        WorldMap.getRebellingAgents().remove((Agent) activeEntity);
-        WorldMap.getActiveAgents().remove((Agent) activeEntity);
-        this.jailedEntities.add(activeEntity);
-        this.activeEntity = null;
-
-    }
-
-    /* helper functions */
-    public void setActiveEntity(Entity entity) {
-        this.activeEntity = entity;
+    public void occupy(Entity entity){
+        entities.add(entity);
     }
 
     public Entity getActiveEntity() {
-        return this.activeEntity;
+        for (Entity entity : entities){
+            if (entity.getSymbol() != 'J'){
+                return entity;
+            }
+        }
+        return null;
     }
 
-    public boolean jailOccupied() {
-        return this.jailedEntities.size() > 0;
+    public void removeEntity(Entity entity){
+        entities.remove(entity);
     }
 
-    public void freeJailedAgent(Entity agent) {
-        this.jailedEntities.remove(agent);
+    public ArrayList<Entity> getJailedEntities() {
+        ArrayList<Entity> jailed = new ArrayList<>();
+        for (Entity entity : entities){
+            if (entity.getSymbol() == 'J'){
+                jailed.add(entity);
+            }
+        }
+        return jailed;
     }
 
     public int getX() {
@@ -56,9 +52,5 @@ public class Tile {
 
     public int getY() {
         return this.y;
-    }
-
-    public ArrayList<Entity> getJailedEntities() {
-        return this.jailedEntities;
     }
 }

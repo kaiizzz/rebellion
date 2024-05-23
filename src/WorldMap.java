@@ -95,7 +95,7 @@ public class WorldMap {
                 entity = remEntities.get(0);
                 int random = (int) (Math.random() * emptyTiles.size());
                 List<Integer> tile = emptyTiles.get(random);
-                map[tile.get(0)][tile.get(1)].setActiveEntity(entity);
+                map[tile.get(0)][tile.get(1)].occupy(entity);
                 entity.setCoords(tile.get(0), tile.get(1));
                 emptyTiles.remove(random);
                 remEntities.remove(entity);
@@ -127,13 +127,13 @@ public class WorldMap {
                         color = Main.ANSI_RED;
                     }
                     // highlight the borders of tiles that are occupied and also have jailed agents purple
-                    if (tile.jailOccupied()) {
+                    if (tile.getJailedEntities().size()>0) {
                         System.out.print(
                                 Main.ANSI_PURPLE + "[" + color + symbol + Main.ANSI_PURPLE + "]" + Main.ANSI_RESET);
                     } else {
                         System.out.print(color + "[" + symbol + "]" + Main.ANSI_RESET);
                     }
-                } else if (tile.jailOccupied()) {
+                } else if (tile.getJailedEntities().size()>0) {
                     System.out.print(Main.ANSI_PURPLE + "[" + "J" + "]" + Main.ANSI_RESET);
                 }
 
@@ -172,7 +172,7 @@ public class WorldMap {
                         tiles.add(tile);
                         continue;
                     }
-                    if (type == 'J' && tile.jailOccupied()) {
+                    if (type == 'J' && tile.getJailedEntities().size() > 0) {
                         tiles.add(tile);
                     }
 

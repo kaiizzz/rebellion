@@ -58,6 +58,9 @@ public class Agent extends Entity {
         } else if (state == AgentState.NORMAL) {
             this.setSymbol(AGENT);
         } else if (state == AgentState.JAILED) {
+            WorldMap.addJailedAgent(this);
+            WorldMap.getRebellingAgents().remove(this);
+            this.jailTerm = (int) (Math.random()*Params.MAX_JAIL_TERM);
             this.setSymbol(JAILED);
         }
     }
@@ -128,11 +131,8 @@ public class Agent extends Entity {
      */
     public void determineArrestProbability(Tile[][] map) {
         // look at all adgacent tiles to see police
-        int policeCount = WorldMap.getTilesInNeighborhood(this.xpos, this.ypos, 'P').size();
-        int agentCount = (1 + WorldMap.getTilesInNeighborhood(this.xpos, this.ypos, 'R').size());
-        if (state == AgentState.REBEL){
-            agentCount -= 1;
-        }
+        double policeCount = WorldMap.getTilesInNeighborhood(this.xpos, this.ypos, 'P').size();
+        double agentCount = (1 + WorldMap.getTilesInNeighborhood(this.xpos, this.ypos, 'R').size());
         this.arrestProbability = (1 - Math.exp(-K * Math.floor(policeCount / agentCount)));
     }
 

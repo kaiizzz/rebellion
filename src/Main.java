@@ -32,7 +32,7 @@ public class Main {
         Main main = new Main();
         int maxSteps = 1;
         int runs = 1;
-
+        
         // scanner to scan for user input
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to our model for Rebellion.");
@@ -107,6 +107,7 @@ public class Main {
                     // create inital map
             WorldMap worldMap = new WorldMap();
             worldMap.setUpMap();
+            worldMap.displayMap();
             
             // create stats list
 
@@ -269,29 +270,26 @@ public class Main {
      */
     public void step(Tile[][] map) {
 
-        // move rule
-        Collections.shuffle(WorldMap.getActiveAgents());
-        for (Entity entity : WorldMap.getActiveAgents()) {
-            entity.move(map);
-        }
-        Collections.shuffle(WorldMap.getPolice());
-        for (Entity entity : WorldMap.getPolice()) {
-            entity.move(map);
-        }
 
-        // agent rule
-        Collections.shuffle(WorldMap.getActiveAgents());
-        for (Entity entity : WorldMap.getActiveAgents()) {
-            Agent agent = (Agent) entity;
-            agent.determineArrestProbability(map);
-            agent.checkRebellion(map);
-        }
+        ArrayList<Entity> allEntities = new ArrayList<>();
+        allEntities.addAll(WorldMap.getActiveAgents());
+        allEntities.addAll(WorldMap.getPolice());
+        allEntities.addAll(WorldMap.getJailedAgents());
+        Collections.shuffle(allEntities);
 
-        // cop rule
-        Collections.shuffle(WorldMap.getPolice());
-        for (Entity entity : WorldMap.getPolice()) {
-            Police police = (Police) entity;
-            police.attemptArrest(map);
+        for (Entity entity : allEntities){
+            if (entity.getSymbol() != 'J'){
+                entity.move(map);
+            }
+            if (entity.getSymbol() == 'A' || entity.getSymbol() == 'R'){
+                Agent agent = (Agent) entity;
+                agent.determineArrestProbability(map);
+                agent.checkRebellion(map);
+            }
+            if (entity.getSymbol() == 'P'){
+                Police police = (Police) entity;
+                police.attemptArrest(map);
+            }
         }
 
         // decrement jail term for jailed agents
