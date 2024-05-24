@@ -12,7 +12,7 @@ import java.util.List;
 
 public class WorldMap {
 
-    private static ArrayList<Entity> quietAgents; 
+    private static ArrayList<Entity> quietAgents;
     private static ArrayList<Agent> jailedAgents;
     private static ArrayList<Agent> rebellingAgents;
 

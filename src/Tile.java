@@ -26,8 +26,8 @@ public class Tile {
 
     // returns active entity from entity list
     public Entity getActiveEntity() {
-        for (Entity entity : entities){
-            if (entity.getSymbol() != 'J'){
+        for (Entity entity : entities) {
+            if (entity.getSymbol() != 'J') {
                 return entity;
             }
         }
@@ -42,8 +42,8 @@ public class Tile {
     // gets all entities jailed on tile
     public ArrayList<Entity> getJailedEntities() {
         ArrayList<Entity> jailed = new ArrayList<>();
-        for (Entity entity : entities){
-            if (entity.getSymbol() == 'J'){
+        for (Entity entity : entities) {
+            if (entity.getSymbol() == 'J') {
                 jailed.add(entity);
             }
         }

@@ -36,10 +36,6 @@ public class Entity {
         map[this.xpos][this.ypos].removeEntity(this);
         newTile.occupy(this);
         setCoords(newTile.getX(), newTile.getY());
-        
-        
-        
-
 
     }
 

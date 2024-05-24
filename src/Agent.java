@@ -54,7 +54,7 @@ public class Agent extends Entity {
         } else if (state == AgentState.JAILED) {
             WorldMap.addJailedAgent(this);
             WorldMap.getRebellingAgents().remove(this);
-            this.jailTerm = (int) (Math.random()*Params.MAX_JAIL_TERM);
+            this.jailTerm = (int) (Math.random() * Params.MAX_JAIL_TERM);
             this.setSymbol(JAILED);
         }
     }
