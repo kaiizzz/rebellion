@@ -35,7 +35,7 @@ The model will then run for the number of steps you entered for how ever many nu
 The output of the model is a csv file called `output.csv` in the root directory of the project. The output contains the following columns for each run:
 step,quiet agents,jailed agents,active agents
 
-At the top of the output file after the right most run, you can find the average stats across all runs (mean of run means, mean of run variances) for each agent type
+At the top of the output file after the right most run (far right of the spreadsheet), you can find the average stats across all runs (mean of run means, mean of run variances) for each agent type. 
 
 The command line will prompt you when the simulation has completed and when the stats have been written to the csv file.
 
