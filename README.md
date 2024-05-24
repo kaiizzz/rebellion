@@ -7,11 +7,12 @@ model of netlogo model "rebellion" in java
 ### Parameters. 
 To change the parameters of the model, you can change the values of the following variables in the `Params.java` file:
 
-- MAP_SIZE: the size of the map, set to 40 by defult as seen in the original model
+- MAP_SIZE: the size of the map, set to 40 by default as seen in the original model
 - VISION: the vision of the agents and police, set to 7 by default as seen in the original model
 - MAX_JAIL_TERM: the maximum jail term for agents, set to 30 by default as seen in the original model
 - INITIAL_AGENT_DENSITY: the initial density of agents in the map, set to 70 by default as seen in the original model
 - INITIAL_POLICE_DENSITY: the initial density of police in the map, set to 4 by default as seen in the original model
+- GOVERNMENT_LEGITIMACY: the perceived legitimacy of the central authority, set to 0.82 by default as seen in the original model
 - EXTENTSION_SCALING: the proportion government legitimacy increases for each nearby jailed agents when extension is enabled, set to 0.003 by default.
 - MOVEMENT: setting it ture will make all entities move, false, they will not move. Set to true by default.
 
