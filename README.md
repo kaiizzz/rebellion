@@ -2,7 +2,7 @@
 model of netlogo model "rebellion" in java
 
 ## INSTRUCTIONS ON HOW TO RUN THE MODEL
-- Make sure you have a java IDE installed on your computer :D
+- Make sure you have program that can run Java
 
 ### Parameters. 
 To change the parameters of the model, you can change the values of the following variables in the `Params.java` file:
