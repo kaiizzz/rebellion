@@ -12,15 +12,13 @@ import java.util.List;
 
 public class WorldMap {
 
-    private static ArrayList<Entity> quietAgents; 
+    private static ArrayList<Entity> quietAgents;
     private static ArrayList<Agent> jailedAgents;
     private static ArrayList<Agent> rebellingAgents;
 
     private static ArrayList<Entity> cops;
 
     private static Tile[][] map;
-
-
 
     @SuppressWarnings("unused")
     public WorldMap() {
@@ -126,14 +124,15 @@ public class WorldMap {
                     } else if (symbol == Agent.REBEL) {
                         color = Main.ANSI_RED;
                     }
-                    // highlight the borders of tiles that are occupied and also have jailed agents purple
-                    if (tile.getJailedEntities().size()>0) {
+                    // highlight the borders of tiles that are occupied and also have jailed agents
+                    // purple
+                    if (tile.getJailedEntities().size() > 0) {
                         System.out.print(
                                 Main.ANSI_PURPLE + "[" + color + symbol + Main.ANSI_PURPLE + "]" + Main.ANSI_RESET);
                     } else {
                         System.out.print(color + "[" + symbol + "]" + Main.ANSI_RESET);
                     }
-                } else if (tile.getJailedEntities().size()>0) {
+                } else if (tile.getJailedEntities().size() > 0) {
                     System.out.print(Main.ANSI_PURPLE + "[" + "J" + "]" + Main.ANSI_RESET);
                 }
 
@@ -156,8 +155,8 @@ public class WorldMap {
      */
     static ArrayList<Tile> getTilesInNeighborhood(int x, int y, char type) {
         ArrayList<Tile> tiles = new ArrayList<>();
-        for (int i = (int) -Params.VISION -1; i <= (int) Params.VISION +1; i++) {
-            for (int j = (int)-Params.VISION -1; j <= (int) Params.VISION +1; j++) {
+        for (int i = (int) -Params.VISION - 1; i <= (int) Params.VISION + 1; i++) {
+            for (int j = (int) -Params.VISION - 1; j <= (int) Params.VISION + 1; j++) {
                 if ((i * i) + (j * j) <= Params.VISION * Params.VISION) {
                     int nx = WorldMap.wrapCoordinates(x + i);
                     int ny = WorldMap.wrapCoordinates(y + j);
@@ -182,12 +181,13 @@ public class WorldMap {
         return tiles;
     }
 
-    public Tile[][] getMap() {
-        return map;
-    }
-
-    // helper function to wrap coordinates that go out of map bounds to other side
-    // of map
+    /**
+     * helper function to wrap coordinates that go out of map bounds to other side
+     * of map
+     * 
+     * @param pos
+     * @return int
+     */
     public static int wrapCoordinates(int pos) {
         int result = pos % Params.MAP_SIZE;
         if (result < 0) {
@@ -197,6 +197,11 @@ public class WorldMap {
     }
 
     /* helper functions */
+
+    public Tile[][] getMap() {
+        return map;
+    }
+
     public static void addJailedAgent(Agent agent) {
         jailedAgents.add(agent);
         quietAgents.remove(agent);

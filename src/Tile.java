@@ -19,27 +19,28 @@ public class Tile {
         this.entities = new ArrayList<>();
     }
 
-    public void occupy(Entity entity){
+    /* helper functions for the data of each tile */
+    public void occupy(Entity entity) {
         entities.add(entity);
     }
 
     public Entity getActiveEntity() {
-        for (Entity entity : entities){
-            if (entity.getSymbol() != 'J'){
+        for (Entity entity : entities) {
+            if (entity.getSymbol() != 'J') {
                 return entity;
             }
         }
         return null;
     }
 
-    public void removeEntity(Entity entity){
+    public void removeEntity(Entity entity) {
         entities.remove(entity);
     }
 
     public ArrayList<Entity> getJailedEntities() {
         ArrayList<Entity> jailed = new ArrayList<>();
-        for (Entity entity : entities){
-            if (entity.getSymbol() == 'J'){
+        for (Entity entity : entities) {
+            if (entity.getSymbol() == 'J') {
                 jailed.add(entity);
             }
         }
