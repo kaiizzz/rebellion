@@ -29,7 +29,7 @@ The model will then ask for how many runs you want to run the model for (So you 
 
 The model will then ask you if you want the GUI to be displayed. Enter `y` for the GUI to be displayed and `n` for the GUI not to be displayed in the command line. This feature may not work with some IDEs. This feature does not influence the results of the model.
 
-The model will then run for the number of steps you entered times by the number of runs you entered. The model will then outputs the result into a file called `output.csv` in the root directory of the project. Note: if you run the model multiple times, the output will be appended to the file. 
+The model will then run for the number of steps you entered for how ever many number of runs you entered. The model will then output the results into a file called `output.csv` in the root directory of the project. Note: if the output file already exists, output will be appended to the file. 
 
 ### Output
 The output of the model is a csv file called `output.csv` in the root directory of the project. The output contains the following columns for each run:
