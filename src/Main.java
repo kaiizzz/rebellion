@@ -15,104 +15,32 @@ import java.util.Scanner;
 
 public class Main {
 
-    // color constants
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_BLACK = "\u001B[30m";
-    public static final String ANSI_RED = "\u001B[31m";
-    public static final String ANSI_GREEN = "\u001B[32m";
-    public static final String ANSI_YELLOW = "\u001B[33m";
-    public static final String ANSI_BLUE = "\u001B[34m";
-    public static final String ANSI_PURPLE = "\u001B[35m";
-    public static final String ANSI_CYAN = "\u001B[36m";
-    public static final String ANSI_WHITE = "\u001B[37m";
-
-    public static boolean extension = false; 
+    public static boolean extension = false;
+    public static boolean displayMap = false; 
+    public static int maxSteps = 1;
+    public static int runs = 1;
 
     public static void main(String[] args) {
         Main main = new Main();
-        int maxSteps = 1;
-        int runs = 1;
-        
-        // scanner to scan for user input
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Welcome to our model for Rebellion.");
-        String response = "";
-        System.out.println("Would you like to run the model" 
-            +" with the extension enabled?");
-        while (!response.equals("y") && !response.equals("n")) {
-            System.out.println("Please enter 'y' or 'n'");
-            response = scanner.next();
-        }
 
-        if (response.equals("y")) {
-            extension = true;
-        }
+        main.getRunOptions();
 
-        System.out.println("\nPlease enter the number of steps: ");
-        // get the number of steps only allow numbers
-        while (!scanner.hasNextInt()){
-            System.out.println("Please enter an integer greater than 0");
-            scanner.nextInt();
-        }
-        maxSteps = scanner.nextInt();
-
-        System.out.println("\nPlease enter the number of runs: ");
-        // get the number of runs only allow numbers
-        while (!scanner.hasNextInt()) {
-            scanner.nextInt();
-        }
-        runs = scanner.nextInt();
-
-        System.out.println("\nWould you like to display the map in the command line? (y/n)");
-        response = "";
-        boolean displayMap = false;
-        while (!response.equals("y") && !response.equals("n")) {
-            System.out.println("Please enter 'y' or 'n'");
-            response = scanner.next();
-        }
-        if (response.equals("y")) {
-            displayMap = true;
-        }
-        System.out.println("\nPlease wait, running for " 
-            + maxSteps + " steps and " + runs + " runs...\n");
-        scanner.close();
-
-        // create output file
-        File file = new File("output.csv");
-        try {
-            FileWriter writer = new FileWriter(file, true);
-
-            // write header
-            writer.write("MODEL SETTINGS\n");
-            writer.write("Government Legitimacy, Vision, Max Jail Term," + 
-                "Agent Density, Cop Density\n");
-            writer.write(Params.GOVERNMET_LEGITIMACY+"," + Params.VISION +"," 
-            + Params.MAX_JAIL_TERM + "," + Params.INITIAL_AGENT_DENSITY + "," 
-            + Params.INITIAL_POLICE_DENSITY + "\n");
-            writer.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // create stats list
-
-
-        // main loop
+        // create statistics storage
         List<List<Integer>> stats = new ArrayList<>();
         for (int x = 0; x < 3*runs; x++) {
             List<Integer> column = new ArrayList<>();
             stats.add(column);
         }
+
+        // begin runs
         for (int i=0; i<runs; i++){
-                    // create inital map
+            System.out.print("Run " + (i + 1) + " of " + runs + ": ");
+
+            // create inital map for run
             WorldMap worldMap = new WorldMap();
             worldMap.setUpMap();
             
-            // create stats list
-
-
-            // run simulation
-            System.out.print("Run " + (i + 1) + " of " + runs + ": ");
+            // begin simulation
             int step = 0;
             while (step <= maxSteps) {
 
@@ -128,15 +56,12 @@ public class Main {
                 main.step(worldMap.getMap());
                 step += 1;
 
-                // display stats for debugging
                 if (displayMap) {
                     System.out.println();
                     System.out.println("Step " + step + ":");
                     System.out.println("quiet agents: " + quietCount);
                     System.out.println("rebeling agents: " + rebelCount);
                     System.out.println("jailed agents: " + jailedCount);
-
-                    // display map
                     worldMap.displayMap();
                 }
 
@@ -156,103 +81,10 @@ public class Main {
             }
             System.out.print(" ✔"); // prints completed step progress bar
             System.out.println(); // print new line after progress bar
-
         }
 
-        try {
-            FileWriter writer = new FileWriter(file, true);
-            ArrayList<ArrayList<Double>> averages = new ArrayList<>();
-            ArrayList<ArrayList<Double>> variances = new ArrayList<>();
+        main.outputStatistics(stats);
         
-            for(int i=0; i<3; i++){
-                averages.add(new ArrayList<Double>());
-                for(int j=0; j<runs; j++){
-                    int sum = 0;
-                    for (int k=0; k<maxSteps; k++){
-                        sum += stats.get(i + 3*j).get(k);
-                    }
-                    double average = (sum/(double)maxSteps);
-                    averages.get(i).add(average);
-                }
-            }
-
-            for(int i=0; i<3; i++){
-                variances.add(new ArrayList<Double>());
-                for(int j=0; j<runs; j++){
-                    double variance = 0;
-                    for (int k=0; k<maxSteps; k++){
-                        variance += Math.pow(stats.get(i + 3*j).get(k) - averages.get(i).get(j), 2);
-                    }
-                    variance /= (double) maxSteps;
-                    variances.get(i).add(variance);
-                }
-            }
-
-            // write header
-            for (int i=0; i<runs; i++){
-                writer.write("Run " + (i + 1) + ",,,,");
-            }
-            writer.write(",quiet mean of means, quiet variance,, jailed mean of means, jailed mean variance,, acitve mean of means, active mean variance");
-            writer.write("\nMean:,");
-            for (int i=0; i<runs; i++){
-                for(int j=0; j<3; j++){ 
-                    writer.write(averages.get(j).get(i) + ",");
-                }
-                writer.write(",");
-            }
-            writer.write("\nVariance:,");
-            for (int i=0; i<runs; i++){
-                for(int j=0; j<3; j++){ 
-                    writer.write(variances.get(j).get(i) + ",");
-                }
-                writer.write(",");
-            }
-
-            for(int i=0; i<3; i++){ 
-                double averageTotal = 0;
-                double varianceTotal = 0;
-                for(int j=0; j<runs; j++){
-                    averageTotal += averages.get(i).get(j);
-                    varianceTotal += variances.get(i).get(j);
-                }
-                double averageAverage = averageTotal/((double) runs);
-                double averageVariance = varianceTotal/((double) runs);
-                if(i==0){
-                    writer.write(averageAverage + ", ");
-                    writer.write(averageVariance + ",,");
-                }
-                if(i==1){
-                    writer.write(averageAverage + ", ");
-                    writer.write(averageVariance + ",,");
-                }  
-                if(i==2){
-                    writer.write(averageAverage + ",");
-                    writer.write(averageVariance + "\n");
-                }      
-                
-            }
-        
-
-            writer.write("\n");
-            for (int i=0; i<runs; i++){
-                writer.write("step,quiet agents,jailed" 
-                + "agents,active agents,");
-            }
-            writer.write("\n");
-            for (int i = 0; i < maxSteps; i++) {
-                for (int j=0; j<runs; j++){
-                    writer.write(i + ",");
-                    for (int k = 0; k < 3; k++) {
-                        writer.write(String.valueOf(stats.get(k + 3*j).get(i)) + ",");
-                    }
-                }
-                writer.write(",\n");
-            } 
-            writer.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-            
         System.out.println("\nSimulation complete.\nStats written" + 
             " to output.csv.\n");
 
@@ -261,24 +93,24 @@ public class Main {
     }
 
     /**
-     * Move agents and police
-     * NOTE - lists of entities are shuffled randomly before move, agent and cop rule
-     * this is to emulate how NetLogo patches return in a random order each time
+     * Perform a single step of the simulation
+     * NOTE - lists of entities are shuffled randomly before move, agent and cop rule applied
+     * this is to emulate how NetLogo entities return in a random order each time
      * 
      * @param map
      */
     public void step(Tile[][] map) {
 
-
         ArrayList<Entity> allEntities = new ArrayList<>();
         allEntities.addAll(WorldMap.getActiveAgents());
         allEntities.addAll(WorldMap.getPolice());
-        allEntities.addAll(WorldMap.getJailedAgents());
         Collections.shuffle(allEntities);
 
+        // run Move, Agent and Cop rule for each entitiy
         for (Entity entity : allEntities){
-            if (entity.getSymbol() != 'J'){
+            if(Params.MOVEMENT){
                 entity.move(map);
+
             }
             if (entity.getSymbol() == 'A' || entity.getSymbol() == 'R'){
                 Agent agent = (Agent) entity;
@@ -306,5 +138,162 @@ public class Main {
             }
         }
         WorldMap.getJailedAgents().removeAll(toRemove);
+    }
+
+    public void getRunOptions(){
+        // get run options from user
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Welcome to our model for Rebellion.");
+        String response = "";
+        System.out.println("Would you like to run the model" 
+            +" with the extension enabled?");
+        while (!response.equals("y") && !response.equals("n")) {
+            System.out.println("Please enter 'y' or 'n'");
+            response = scanner.next();
+        }
+
+        if (response.equals("y")) {
+            extension = true;
+        }
+
+        System.out.println("\nPlease enter the number of steps: ");
+        while (!scanner.hasNextInt()){
+            System.out.println("Please enter an integer greater than 0");
+            scanner.nextInt();
+        }
+        maxSteps = scanner.nextInt();
+
+        System.out.println("\nPlease enter the number of runs: ");
+        while (!scanner.hasNextInt()) {
+            scanner.nextInt();
+        }
+        runs = scanner.nextInt();
+
+        System.out.println("\nWould you like to display the map in the command line? (y/n)");
+        response = "";
+        while (!response.equals("y") && !response.equals("n")) {
+            System.out.println("Please enter 'y' or 'n'");
+            response = scanner.next();
+        }
+        if (response.equals("y")) {
+            displayMap = true;
+        }
+
+        System.out.println("\nPlease wait, running for " 
+            + maxSteps + " steps and " + runs + " runs...\n");
+        scanner.close();
+
+    }
+
+    public void outputStatistics(List<List<Integer>> stats){
+                File file = new File("output.csv");
+                try {
+                    FileWriter writer = new FileWriter(file, true);
+                
+                    // write header
+                    writer.write("MODEL SETTINGS\n");
+                    writer.write("Government Legitimacy, Vision, Max Jail Term," + 
+                        "Agent Density, Cop Density\n");
+                    writer.write(Params.GOVERNMET_LEGITIMACY+"," + Params.VISION +"," 
+                    + Params.MAX_JAIL_TERM + "," + Params.INITIAL_AGENT_DENSITY + "," 
+                    + Params.INITIAL_POLICE_DENSITY + "\n");
+
+                    // stats output 
+                    ArrayList<ArrayList<Double>> averages = new ArrayList<>();
+                    ArrayList<ArrayList<Double>> variances = new ArrayList<>();
+                
+                    // compute mean of each run
+                    for(int i=0; i<3; i++){
+                        averages.add(new ArrayList<Double>());
+                        for(int j=0; j<runs; j++){
+                            int sum = 0;
+                            for (int k=0; k<maxSteps; k++){
+                                sum += stats.get(i + 3*j).get(k);
+                            }
+                            double average = (sum/(double)maxSteps);
+                            averages.get(i).add(average);
+                        }
+                    }
+        
+                    // compute variance of each run
+                    for(int i=0; i<3; i++){
+                        variances.add(new ArrayList<Double>());
+                        for(int j=0; j<runs; j++){
+                            double variance = 0;
+                            for (int k=0; k<maxSteps; k++){
+                                variance += Math.pow(stats.get(i + 3*j).get(k) 
+                                - averages.get(i).get(j), 2);
+                            }
+                            variance /= (double) maxSteps;
+                            variances.get(i).add(variance);
+                        }
+                    }
+        
+                    // write header
+                    for (int i=0; i<runs; i++){
+                        writer.write("Run " + (i + 1) + ",,,,");
+                    }
+                    writer.write(",quiet mean of means, quiet variance,, jailed mean of means,"  
+                    + "jailed mean variance,, acitve mean of means, active mean variance");
+                    writer.write("\nMean:,");
+                    for (int i=0; i<runs; i++){
+                        for(int j=0; j<3; j++){ 
+                            writer.write(averages.get(j).get(i) + ",");
+                        }
+                        writer.write(",");
+                    }
+                    writer.write("\nVariance:,");
+                    for (int i=0; i<runs; i++){
+                        for(int j=0; j<3; j++){ 
+                            writer.write(variances.get(j).get(i) + ",");
+                        }
+                        writer.write(",");
+                    }
+                    
+                    // write mean mean and mean variance
+                    // these can be found at the top right of created spreadsheet
+                    for(int i=0; i<3; i++){ 
+                        double averageTotal = 0;
+                        double varianceTotal = 0;
+                        for(int j=0; j<runs; j++){
+                            averageTotal += averages.get(i).get(j);
+                            varianceTotal += variances.get(i).get(j);
+                        }
+                        double averageAverage = averageTotal/((double) runs);
+                        double averageVariance = varianceTotal/((double) runs);
+                        if(i==0){
+                            writer.write(averageAverage + ", ");
+                            writer.write(averageVariance + ",,");
+                        }
+                        if(i==1){
+                            writer.write(averageAverage + ", ");
+                            writer.write(averageVariance + ",,");
+                        }  
+                        if(i==2){
+                            writer.write(averageAverage + ",");
+                            writer.write(averageVariance + "\n");
+                        }      
+                        
+                    }
+        
+                    writer.write("\n");
+                    for (int i=0; i<runs; i++){
+                        writer.write("step,quiet agents,jailed" 
+                        + "agents,active agents,");
+                    }
+                    writer.write("\n");
+                    for (int i = 0; i < maxSteps; i++) {
+                        for (int j=0; j<runs; j++){
+                            writer.write(i + ",");
+                            for (int k = 0; k < 3; k++) {
+                                writer.write(String.valueOf(stats.get(k + 3*j).get(i)) + ",");
+                            }
+                        }
+                        writer.write(",\n");
+                    } 
+                    writer.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
     }
 }

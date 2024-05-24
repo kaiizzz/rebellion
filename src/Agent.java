@@ -33,21 +33,15 @@ public class Agent extends Entity {
     public Agent() {
         super(AGENT);
 
-        // percieved hardspip dowuble from 0-1
         this.percievedHardship = Math.random();
-
-        // risk aversion double from 0-1
         this.riskAversion = Math.random();
-
-        // greivance calculation
         this.grievance = this.percievedHardship * (1 - Params.GOVERNMET_LEGITIMACY);
 
-        // this.arrestProbability = 1;
 
     }
 
     /**
-     * Update the state of the agent
+     * Update the state and symbol of agent
      * 
      * @param state
      */
@@ -71,40 +65,37 @@ public class Agent extends Entity {
      * @return a string of the state
      */
     public String toString() {
-        return ("percived hardship: " + percievedHardship + " " + "risk aversion: " + riskAversion);
+        return ("percived hardship: " + percievedHardship 
+                + " " + "risk aversion: " + riskAversion);
     }
 
     /**
-     * Determine if the agent will rebel
+     * Determine if agent will rebel
      * 
      * @param map
-     * @param x
-     * @param y
      * @return
      */
     public void checkRebellion(Tile[][] map) {
-        // System.out.println((this.grievance - this.riskAversion * arrestProbability)
-        // ); // uncomment for
-        // debugging
 
+        // recalculates grievance if extension is enabled
         if (Main.extension) {
             int jailedCount = 0;
 
-            // loop through all jailed agents in the neighborhood
+            // count all jailed entities in neighborhood
             for (Tile tile : WorldMap.getTilesInNeighborhood(this.xpos, this.ypos, 'J')) {
                 for (Entity entity : tile.getJailedEntities())
-                    // in case of agents who have not been able to move out of jail due to lack of
                     if (((Agent) entity).jailTerm > 0) {
                         jailedCount += 1;
                     }
             }
 
-            // calculate the base grievance
+            // calculate grievance based off scaled government legitimacy
             grievance = percievedHardship
-                    * (1 - (Params.GOVERNMET_LEGITIMACY * (1 + (Params.EXTENTSION_SCALING * jailedCount))));
+                    * (1 - (Params.GOVERNMET_LEGITIMACY 
+                    * (1 + (Params.EXTENTSION_SCALING * jailedCount))));
         }
 
-        // check if the agent will rebel
+        // check if the agent will rebel, update state
         if ((grievance - (this.riskAversion * this.arrestProbability)) > REBEL_THRESHOLD) {
             if (state == AgentState.NORMAL) {
                 WorldMap.getRebellingAgents().add(this);
@@ -122,17 +113,16 @@ public class Agent extends Entity {
     }
 
     /**
-     * Determine the probability of arrest
+     * Calculates the probability of agent being arrested should it rebel
      * 
      * @param map
-     * @param xpos
-     * @param ypos
      * @return probability
      */
     public void determineArrestProbability(Tile[][] map) {
-        // look at all adgacent tiles to see police
+        // look at all adjacent tiles to see police
         double policeCount = WorldMap.getTilesInNeighborhood(this.xpos, this.ypos, 'P').size();
-        double agentCount = (1 + WorldMap.getTilesInNeighborhood(this.xpos, this.ypos, 'R').size());
+        double agentCount = 
+        (1 + WorldMap.getTilesInNeighborhood(this.xpos, this.ypos, 'R').size());
         this.arrestProbability = (1 - Math.exp(-K * Math.floor(policeCount / agentCount)));
     }
 
@@ -153,7 +143,7 @@ public class Agent extends Entity {
     }
 
     /**
-     * attempt to free the agent when jail term is over
+     * free agent if jail term is served
      * 
      * @return boolean
      */

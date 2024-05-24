@@ -13,19 +13,18 @@ public class Police extends Entity {
 
     public Police() {
         super(POLICE);
-        // System.out.println("Police created");
     }
 
     public void attemptArrest(Tile map[][]) {
 
-        // find tiles in vision range that contain rebels
+        // get tiles in vision range that contain rebels
         ArrayList<Tile> rebelTiles = WorldMap.getTilesInNeighborhood(this.xpos, this.ypos, 'R');
 
         if (rebelTiles.size() == 0) {
             return;
         }
 
-        // select a random rebel tile
+        // select a random rebel tile, move to it and jail rebel
         int random = (int) (Math.random() * rebelTiles.size());
         Tile chosenTile = rebelTiles.get(random);
         ((Agent) chosenTile.getActiveEntity()).update(AgentState.JAILED);

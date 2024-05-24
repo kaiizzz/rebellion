@@ -19,10 +19,12 @@ public class Tile {
         this.entities = new ArrayList<>();
     }
 
+    // adds an entity to the tile
     public void occupy(Entity entity){
         entities.add(entity);
     }
 
+    // returns active entity from entity list
     public Entity getActiveEntity() {
         for (Entity entity : entities){
             if (entity.getSymbol() != 'J'){
@@ -32,10 +34,12 @@ public class Tile {
         return null;
     }
 
+    // removes entity from entity list
     public void removeEntity(Entity entity){
         entities.remove(entity);
     }
 
+    // gets all entities jailed on tile
     public ArrayList<Entity> getJailedEntities() {
         ArrayList<Entity> jailed = new ArrayList<>();
         for (Entity entity : entities){
@@ -45,6 +49,8 @@ public class Tile {
         }
         return jailed;
     }
+
+    // getters
 
     public int getX() {
         return this.x;

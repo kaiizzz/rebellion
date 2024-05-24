@@ -20,6 +20,14 @@ public class WorldMap {
 
     private static Tile[][] map;
 
+    // color constants for pretty map display
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+    public static final String ANSI_PURPLE = "\u001B[35m";
+    public static final String ANSI_WHITE = "\u001B[37m";
+    
 
 
     @SuppressWarnings("unused")
@@ -31,7 +39,7 @@ public class WorldMap {
             System.exit(0);
         }
 
-        // create map
+        // populate map with tiles
         WorldMap.map = new Tile[Params.MAP_SIZE][Params.MAP_SIZE];
         for (int i = 0; i < Params.MAP_SIZE; i++) {
             for (int j = 0; j < Params.MAP_SIZE; j++) {
@@ -51,15 +59,15 @@ public class WorldMap {
         cops = new ArrayList<>();
 
         // create cops
-        int numberOfCops = (int) (Params.INITIAL_POLICE_DENSITY * 0.01 * Params.MAP_SIZE * Params.MAP_SIZE);
-        // System.out.println("Number of cops: " + numberOfCops); // for debugging
+        int numberOfCops = (int) (Params.INITIAL_POLICE_DENSITY * 0.01 
+                                  * Params.MAP_SIZE * Params.MAP_SIZE);
         for (int i = 0; i < numberOfCops; i++) {
             cops.add(new Police());
         }
 
         // Create agents
-        int numberOfAgents = (int) (Params.INITIAL_AGENT_DENSITY * 0.01 * Params.MAP_SIZE * Params.MAP_SIZE);
-        // System.out.println("Number of agents: " + numberOfAgents); // for debugging
+        int numberOfAgents = (int) (Params.INITIAL_AGENT_DENSITY * 0.01 
+                                    * Params.MAP_SIZE * Params.MAP_SIZE);
         for (int i = 0; i < numberOfAgents; i++) {
             quietAgents.add(new Agent());
 
@@ -90,7 +98,7 @@ public class WorldMap {
         List<Entity> remEntities = new ArrayList<>(entities);
         try {
             Entity entity;
-            // places entities randomly into unoccupied tiles
+            // places entities randomly into unoccupied tiles until no more entities left
             while (!remEntities.isEmpty()) {
                 entity = remEntities.get(0);
                 int random = (int) (Math.random() * emptyTiles.size());
@@ -111,30 +119,29 @@ public class WorldMap {
      * 
      */
     public void displayMap() {
-        // display map
+        // displays map with pretty colors
         for (int i = 0; i < Params.MAP_SIZE; i++) {
             for (int j = 0; j < Params.MAP_SIZE; j++) {
                 Tile tile = map[i][j];
                 if (!(tile.getActiveEntity() == null)) {
                     char symbol = tile.getActiveEntity().getSymbol();
-                    String color = Main.ANSI_GREEN;
-                    // colors police blue, rebels red and jailed agents purple
+                    String color = ANSI_GREEN;
                     if (symbol == Agent.JAILED) {
-                        color = Main.ANSI_PURPLE;
+                        color = ANSI_PURPLE;
                     } else if (symbol == Police.POLICE) {
-                        color = Main.ANSI_BLUE;
+                        color = ANSI_BLUE;
                     } else if (symbol == Agent.REBEL) {
-                        color = Main.ANSI_RED;
+                        color = ANSI_RED;
                     }
-                    // highlight the borders of tiles that are occupied and also have jailed agents purple
                     if (tile.getJailedEntities().size()>0) {
                         System.out.print(
-                                Main.ANSI_PURPLE + "[" + color + symbol + Main.ANSI_PURPLE + "]" + Main.ANSI_RESET);
+                                ANSI_PURPLE + "[" + color + symbol + 
+                                ANSI_PURPLE + "]" + ANSI_RESET);
                     } else {
-                        System.out.print(color + "[" + symbol + "]" + Main.ANSI_RESET);
+                        System.out.print(color + "[" + symbol + "]" + ANSI_RESET);
                     }
                 } else if (tile.getJailedEntities().size()>0) {
-                    System.out.print(Main.ANSI_PURPLE + "[" + "J" + "]" + Main.ANSI_RESET);
+                    System.out.print(ANSI_PURPLE + "[" + "J" + "]" + ANSI_RESET);
                 }
 
                 else {
@@ -156,22 +163,27 @@ public class WorldMap {
      */
     static ArrayList<Tile> getTilesInNeighborhood(int x, int y, char type) {
         ArrayList<Tile> tiles = new ArrayList<>();
+        // looks at each tile in vision range of entity
+        // -1s and +1s are so that all tiles are checked when vision double is rounded down 
         for (int i = (int) -Params.VISION -1; i <= (int) Params.VISION +1; i++) {
             for (int j = (int)-Params.VISION -1; j <= (int) Params.VISION +1; j++) {
+                // checks if tile is within vision radius
                 if ((i * i) + (j * j) <= Params.VISION * Params.VISION) {
                     int nx = WorldMap.wrapCoordinates(x + i);
                     int ny = WorldMap.wrapCoordinates(y + j);
                     Tile tile = map[nx][ny];
+                    // tiles with no active agent
                     if (tile.getActiveEntity() == null) {
                         if (type == ' ') {
                             tiles.add(map[nx][ny]);
                             continue;
                         }
-
+                    // tiles with specified agent
                     } else if (tile.getActiveEntity().getSymbol() == type) {
                         tiles.add(tile);
                         continue;
                     }
+                    // tiles with jailed agents
                     if (type == 'J' && tile.getJailedEntities().size() > 0) {
                         tiles.add(tile);
                     }
@@ -182,12 +194,9 @@ public class WorldMap {
         return tiles;
     }
 
-    public Tile[][] getMap() {
-        return map;
-    }
 
-    // helper function to wrap coordinates that go out of map bounds to other side
-    // of map
+
+    // wraps coordinates that go out of map bounds to other side of map
     public static int wrapCoordinates(int pos) {
         int result = pos % Params.MAP_SIZE;
         if (result < 0) {
@@ -200,6 +209,10 @@ public class WorldMap {
     public static void addJailedAgent(Agent agent) {
         jailedAgents.add(agent);
         quietAgents.remove(agent);
+    }
+
+    public Tile[][] getMap() {
+        return map;
     }
 
     public static List<Entity> getActiveAgents() {

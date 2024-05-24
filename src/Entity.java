@@ -19,19 +19,18 @@ public class Entity {
     }
 
     /**
-     * Move the entity to a new position
+     * Moves entity to a random unoccupied position in vision
      * 
      * @param map
-     * @param x
-     * @param y
      */
     public void move(Tile[][] map) {
+        // gets all  tiles in vision
         ArrayList<Tile> emptyTiles = WorldMap.getTilesInNeighborhood(this.xpos, this.ypos, ' ');
         if (emptyTiles.size() == 0) {
             return;
         }
 
-        // randomly select one empty tile and move to it
+        // randomly selects one unoccupied tile and moves to it
         int random = (int) (Math.random() * emptyTiles.size());
         Tile newTile = emptyTiles.get(random);
         map[this.xpos][this.ypos].removeEntity(this);
